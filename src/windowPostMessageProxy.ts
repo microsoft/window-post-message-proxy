@@ -1,4 +1,4 @@
-interface IDeferred {
+export interface IDeferred {
   resolve: <T>(value?: T | Thenable<T>) => void,
   reject: <T>(error: T) => void,
   promise: Promise<any>
@@ -34,21 +34,28 @@ export interface IMessageHandler {
   handle(message: any): any;
 }
 
+export interface IWindowPostMessageProxyOptions {
+  receiveWindow?: Window;
+  processTrackingProperties?: IProcessTrackingProperties;
+  isErrorMessage?: IIsErrorMessage;
+  name?: string;
+}
+
 export class WindowPostMessageProxy {
   // Static
-  private static defaultAddTrackingProperties<T>(message: T, trackingProperties: ITrackingProperties): T {
+  static defaultAddTrackingProperties<T>(message: T, trackingProperties: ITrackingProperties): T {
     (<any>message)[WindowPostMessageProxy.messagePropertyName] = trackingProperties;
     return message;
   }
-  private static defaultGetTrackingProperties(message: any): ITrackingProperties {
+  static defaultGetTrackingProperties(message: any): ITrackingProperties {
     return message[WindowPostMessageProxy.messagePropertyName];
   }
   
-  private static defaultIsErrorMessage(message: any): boolean {
+  static defaultIsErrorMessage(message: any): boolean {
     return !!message.error;
   }
   
-  private static messagePropertyName = "windowPostMesssageProxy";
+  private static messagePropertyName = "windowPostMessageProxy";
   
   // Private
   private name: string;
@@ -56,24 +63,34 @@ export class WindowPostMessageProxy {
   private getTrackingProperties: IGetTrackingProperties;
   private isErrorMessage: IIsErrorMessage;
   private contentWindow: Window;
+  private receiveWindow: Window;
   private pendingRequestPromises: IDeferredCache = {};
   private handlers: IMessageHandler[];
   private windowMessageHandler: (e: MessageEvent) => any;
 
   constructor(
     contentWindow: Window,
-    processTrackingProperties: IProcessTrackingProperties = {
+    options: IWindowPostMessageProxyOptions = {
+    processTrackingProperties: {
       addTrackingProperties: WindowPostMessageProxy.defaultAddTrackingProperties,
       getTrackingProperties: WindowPostMessageProxy.defaultGetTrackingProperties
     },
-    isErrorMessage: IIsErrorMessage = WindowPostMessageProxy.defaultIsErrorMessage
-  ) {
-    this.addTrackingProperties = processTrackingProperties.addTrackingProperties;
-    this.getTrackingProperties = processTrackingProperties.getTrackingProperties;
-    this.isErrorMessage = isErrorMessage;
-    this.handlers = [];
-    this.name = `WindowProxyMessageHandler(${WindowPostMessageProxy.createRandomString()})`;
+    isErrorMessage: WindowPostMessageProxy.defaultIsErrorMessage,
+    receiveWindow: window,
+    name: WindowPostMessageProxy.createRandomString()
+  }) {
+    // save contentWindow
     this.contentWindow = contentWindow;
+    
+    // save options with defaults
+    this.addTrackingProperties = (options.processTrackingProperties && options.processTrackingProperties.addTrackingProperties) || WindowPostMessageProxy.defaultAddTrackingProperties;
+    this.getTrackingProperties = (options.processTrackingProperties && options.processTrackingProperties.getTrackingProperties) || WindowPostMessageProxy.defaultGetTrackingProperties;
+    this.isErrorMessage = options.isErrorMessage || WindowPostMessageProxy.defaultIsErrorMessage;
+    this.receiveWindow = options.receiveWindow || window;
+    this.name = options.name || WindowPostMessageProxy.createRandomString();
+    
+    // Initialize
+    this.handlers = [];
     this.windowMessageHandler = (event: MessageEvent) => this.onMessageReceived(event);
     this.start();
   }
@@ -102,14 +119,14 @@ export class WindowPostMessageProxy {
    * Start listening to message events.
    */
   start() {
-    window.addEventListener('message', this.windowMessageHandler);
+    this.receiveWindow.addEventListener('message', this.windowMessageHandler);
   }
   
   /**
    * Stops listening to message events.
    */
   stop() {
-    window.removeEventListener('message', this.windowMessageHandler);
+    this.receiveWindow.removeEventListener('message', this.windowMessageHandler);
   }
   
   /**
@@ -120,6 +137,7 @@ export class WindowPostMessageProxy {
     const trackingProperties: ITrackingProperties = { id: WindowPostMessageProxy.createRandomString() };
     this.addTrackingProperties(message, trackingProperties);
     
+    console.log(`${this.name} Posting message:`);
     this.contentWindow.postMessage(message, "*");
     const deferred = WindowPostMessageProxy.createDeferred();
     this.pendingRequestPromises[trackingProperties.id] = deferred;
@@ -133,6 +151,7 @@ export class WindowPostMessageProxy {
    */
   private sendResponse(message: any, trackingProperties: ITrackingProperties): void {
     this.addTrackingProperties(message, trackingProperties);
+    console.log(`${this.name} Sending response:`);
     this.contentWindow.postMessage(message, "*");
   }
   
@@ -164,6 +183,17 @@ export class WindowPostMessageProxy {
           return true;
         }
       });
+      
+      /**
+       * TODO: Consider returning an error message if nothing handled the message.
+       * In the case of the Report receiving messages all of them should be handled,
+       * however, in the case of the SDK receiving messages it's likely it won't register handlers
+       * for all events. Perhaps make this an option at construction time.
+       */
+      if(!handled) {
+        console.warn(`Proxy(${this.name}) did not handle message. Handlers: ${this.handlers.length}  Message: ${JSON.stringify(message, null, '')}.`);
+        // this.sendResponse({ notHandled: true }, trackingProperties);
+      }
     }
     else {
       /**
@@ -176,6 +206,9 @@ export class WindowPostMessageProxy {
       else {
         deferred.resolve(message);
       }
+      
+      // TODO: Move to .finally clause up where promise is created for better maitenance like original proxy code.
+      delete this.pendingRequestPromises[trackingProperties.id];
     }
   }
 
@@ -183,7 +216,7 @@ export class WindowPostMessageProxy {
    * Utility to create a deferred object.
    */
   // TODO: Look to use RSVP library instead of doing this manually.
-  // From what I searched RSVP would work better because it has .finally and .deferred but it doesn't have Typings information. 
+  // From what I searched RSVP would work better because it has .finally and .deferred; however, it doesn't have Typings information. 
   private static createDeferred(): IDeferred {
     const deferred: IDeferred = {
       resolve: null,

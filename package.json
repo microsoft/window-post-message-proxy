@@ -32,10 +32,13 @@
     "karma-coverage": "^0.5.5",
     "karma-jasmine": "^0.3.8",
     "karma-phantomjs-launcher": "^1.0.0",
+    "karma-sourcemap-loader": "^0.3.7",
     "karma-spec-reporter": "0.0.26",
     "merge2": "^1.0.2",
     "phantomjs-prebuilt": "^2.1.7",
     "run-sequence": "^1.1.5",
+    "ts-loader": "^0.8.2",
+    "webpack-stream": "^3.2.0",
     "yargs": "^4.6.0"
   },
   "publishConfig": {

@@ -7,9 +7,8 @@ module.exports = function (config) {
         files: [
           './node_modules/jquery/dist/jquery.js',
           './node_modules/es6-promise/dist/es6-promise.js',
-          './dist/**/*.js',
-          { pattern: './test/**/*.js', included: true },
-          { pattern: './test/**/*.html', served: true, included: false }
+          './tmp/**/*.js',
+          { pattern: './tmp/**/*.html', served: true, included: false }
         ],
         exclude: [],
         reporters: argv.debug ? ['spec'] : ['spec', 'coverage'],
@@ -22,7 +21,10 @@ module.exports = function (config) {
             'karma-phantomjs-launcher',
             'karma-coverage'
         ],
-        preprocessors: { './dist/**/*.js': ['coverage'] },
+        preprocessors: {
+            // './dist/**/*.js': ['coverage'],
+            './tmp/**/*.js': ['sourcemap']
+        },
         coverageReporter: {
             reporters: [
                 { type: 'html' },
