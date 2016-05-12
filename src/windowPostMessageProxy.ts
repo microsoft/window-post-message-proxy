@@ -1,4 +1,4 @@
-export interface IDeferred {
+interface IDeferred {
   resolve: <T>(value?: T | Thenable<T>) => void,
   reject: <T>(error: T) => void,
   promise: Promise<any>

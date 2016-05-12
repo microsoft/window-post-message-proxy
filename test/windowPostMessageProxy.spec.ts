@@ -1,7 +1,7 @@
 import * as wpmp from '../src/windowPostMessageProxy';
 
-function createDeferred(): wpmp.IDeferred {
-    const deferred: wpmp.IDeferred = {
+function createDeferred() {
+    const deferred:any = {
       resolve: null,
       reject: null,
       promise: null
@@ -156,6 +156,36 @@ describe('windowPostMessageProxy', function () {
       
       // Assert
     });
+    
+    it("multiple handlers can be registered but only one can handle a message", function (done) {
+      // Arrange
+      const testData = {
+        message: {
+          someKey: true
+        }
+      };
+      
+      const unusedHandler: wpmp.IMessageHandler = {
+        test() { return true },
+        handle: jasmine.createSpy("unusedHandlerSpy")
+      };
+      
+      const unusedHandlerSpy: jasmine.Spy = <any>unusedHandler.handle;
+      
+      iframeWindowPostMessageProxy.addHandler(unusedHandler);
+      
+      // Act
+      iframeLoaded
+        .then(() => {
+          windowPostMessageProxy.postMessage(testData.message)
+            .then((message:any) => {
+              expect(unusedHandlerSpy).not.toHaveBeenCalled();
+              done();
+            });
+        });
+      
+      // Assert
+    })
 
     it("consumers can override how tracking id is added and retrieved from the message by passing in object at construction time.", function (done) {
       // Setup
@@ -261,6 +291,7 @@ describe('windowPostMessageProxy', function () {
       
       // Cleanup
     });
+
   });
   
   // // Goal is to test entire post message protocol against live embed page by sending messages and testing response.
