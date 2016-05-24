@@ -8,6 +8,10 @@
     "test": "gulp test --debug",
     "prepublish": "tsc -p ."
   },
+  "repository": {
+    "type": "git",
+    "url": "https://pbix.visualstudio.com/DefaultCollection/PaaS/_git/window-post-message-proxy"
+  },
   "keywords": [
     "window",
     "post",

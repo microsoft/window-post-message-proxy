@@ -2,5 +2,3 @@ node_modules
 typings
 dist
 tmp
-test/*.js
-test/*/*.js

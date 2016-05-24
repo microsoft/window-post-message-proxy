@@ -1,5 +1,5 @@
 {
-  "name": "iframetester",
+  "name": "window-post-message-proxy",
   "version": false,
   "dependencies": {},
   "ambientDependencies": {

@@ -1,7 +1,7 @@
 module.exports = {  
   entry: './test/windowPostMessageProxy.spec.ts',
   output: {
-    path: __dirname + "/build",
+    path: __dirname + "/tmp",
     filename: 'windowPostMessageProxy.spec.js'
   },
   devtool: 'source-map',

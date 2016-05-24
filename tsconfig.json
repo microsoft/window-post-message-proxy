@@ -1,7 +1,6 @@
 {
     "compilerOptions": {
-        "target": "es5",
-        "module": "es2015",
+        "target": "es2015",
         "declaration": true,
         "noImplicitAny": true,
         "sourceMap": true,
