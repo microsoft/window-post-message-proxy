@@ -1,5 +1,5 @@
 interface IDeferred {
-  resolve: <T>(value?: T | Thenable<T>) => void,
+  resolve: <T>(value?: T | Promise<T>) => void,
   reject: <T>(error: T) => void,
   promise: Promise<any>
 }

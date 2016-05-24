@@ -8,8 +8,8 @@
     },
     "exclude": [
         "node_modules",
-        "typings/main",
-        "typings/main.d.ts",
+        "typings/globals/es6-promise",
+        "typings/index.d.ts",
         "dist",
         "test",
         "tmp"
