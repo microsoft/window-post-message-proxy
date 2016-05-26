@@ -98,19 +98,6 @@ Example:
 function isErrorMessage(message: any) {
     return !(200 <= message.status && message.status < 300);
 }
-```
 
-## Building
+const windowPostMessageProxy = new WindowPostMessageProxy(iframe.contentWindow,  { isErrorMessage });
 ```
-tsc -p .
-```
-Or run `Ctrl + Shift + B` when in Code.
-
-## Testing
-```
-gulp test --debug
-```
-The `--debug` uses Chrome and single run. This is temporary work around since phantomjs is timing out.
-You can also enable watching by adding the `--watch` argument. 
-
-
