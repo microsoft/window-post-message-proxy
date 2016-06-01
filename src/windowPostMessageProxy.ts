@@ -39,6 +39,7 @@ export interface IWindowPostMessageProxyOptions {
   processTrackingProperties?: IProcessTrackingProperties;
   isErrorMessage?: IIsErrorMessage;
   name?: string;
+  logMessages?: boolean;
 }
 
 export class WindowPostMessageProxy {
@@ -58,6 +59,7 @@ export class WindowPostMessageProxy {
   private static messagePropertyName = "windowPostMessageProxy";
   
   // Private
+  private logMessages: boolean;
   private name: string;
   private addTrackingProperties: IAddTrackingProperties;
   private getTrackingProperties: IGetTrackingProperties;
@@ -88,6 +90,7 @@ export class WindowPostMessageProxy {
     this.isErrorMessage = options.isErrorMessage || WindowPostMessageProxy.defaultIsErrorMessage;
     this.receiveWindow = options.receiveWindow || window;
     this.name = options.name || WindowPostMessageProxy.createRandomString();
+    this.logMessages = options.logMessages || false;
     
     // Initialize
     this.handlers = [];
@@ -137,7 +140,11 @@ export class WindowPostMessageProxy {
     const trackingProperties: ITrackingProperties = { id: WindowPostMessageProxy.createRandomString() };
     this.addTrackingProperties(message, trackingProperties);
     
-    console.log(`${this.name} Posting message:`);
+    if(this.logMessages) {
+      console.log(`${this.name} Posting message:`);
+      console.log(JSON.stringify(message, null, '  '));
+    }
+    
     this.contentWindow.postMessage(message, "*");
     const deferred = WindowPostMessageProxy.createDeferred();
     this.pendingRequestPromises[trackingProperties.id] = deferred;
@@ -151,7 +158,12 @@ export class WindowPostMessageProxy {
    */
   private sendResponse(message: any, trackingProperties: ITrackingProperties): void {
     this.addTrackingProperties(message, trackingProperties);
-    console.log(`${this.name} Sending response:`);
+    
+    if(this.logMessages) {
+      console.log(`${this.name} Sending response:`);
+      console.log(JSON.stringify(message, null, '  '));
+    }
+    
     this.contentWindow.postMessage(message, "*");
   }
   
@@ -159,10 +171,12 @@ export class WindowPostMessageProxy {
    * Message handler.
    */
   private onMessageReceived(event: MessageEvent) {
-    console.log(`${this.name} Received message:`);
-    console.log(`type: ${event.type}`);
-    console.log(JSON.stringify(event.data, null, '  '));
-
+    if(this.logMessages) {
+      console.log(`${this.name} Received message:`);
+      console.log(`type: ${event.type}`);
+      console.log(JSON.stringify(event.data, null, '  '));
+    }
+    
     let message:any = event.data;
     let trackingProperties: ITrackingProperties = this.getTrackingProperties(message);
     
@@ -178,8 +192,11 @@ export class WindowPostMessageProxy {
     if (!deferred) {
       const handled = this.handlers.some(handler => {
         if(handler.test(message)) {
-          const responseMessage = handler.handle(message);
-          this.sendResponse(responseMessage, trackingProperties);
+          Promise.resolve(handler.handle(message))
+            .then(responseMessage => {
+              this.sendResponse(responseMessage, trackingProperties);
+            });
+            
           return true;
         }
       });
