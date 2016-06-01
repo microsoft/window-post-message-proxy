@@ -5,7 +5,7 @@
   "main": "dist/windowPostMessageProxy.js",
   "typings": "dist/windowPostMessageProxy.d.ts",
   "scripts": {
-    "test": "gulp test --debug",
+    "test": "gulp test --chrome",
     "prepublish": "tsc -p ."
   },
   "repository": {
