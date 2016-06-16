@@ -51,13 +51,13 @@ export class WindowPostMessageProxy {
   static defaultGetTrackingProperties(message: any): ITrackingProperties {
     return message[WindowPostMessageProxy.messagePropertyName];
   }
-  
+
   static defaultIsErrorMessage(message: any): boolean {
     return !!message.error;
   }
-  
+
   private static messagePropertyName = "windowPostMessageProxy";
-  
+
   // Private
   private logMessages: boolean;
   private name: string;
@@ -73,17 +73,17 @@ export class WindowPostMessageProxy {
   constructor(
     contentWindow: Window,
     options: IWindowPostMessageProxyOptions = {
-    processTrackingProperties: {
-      addTrackingProperties: WindowPostMessageProxy.defaultAddTrackingProperties,
-      getTrackingProperties: WindowPostMessageProxy.defaultGetTrackingProperties
-    },
-    isErrorMessage: WindowPostMessageProxy.defaultIsErrorMessage,
-    receiveWindow: window,
-    name: WindowPostMessageProxy.createRandomString()
-  }) {
+      processTrackingProperties: {
+        addTrackingProperties: WindowPostMessageProxy.defaultAddTrackingProperties,
+        getTrackingProperties: WindowPostMessageProxy.defaultGetTrackingProperties
+      },
+      isErrorMessage: WindowPostMessageProxy.defaultIsErrorMessage,
+      receiveWindow: window,
+      name: WindowPostMessageProxy.createRandomString()
+    }) {
     // save contentWindow
     this.contentWindow = contentWindow;
-    
+
     // save options with defaults
     this.addTrackingProperties = (options.processTrackingProperties && options.processTrackingProperties.addTrackingProperties) || WindowPostMessageProxy.defaultAddTrackingProperties;
     this.getTrackingProperties = (options.processTrackingProperties && options.processTrackingProperties.getTrackingProperties) || WindowPostMessageProxy.defaultGetTrackingProperties;
@@ -91,13 +91,13 @@ export class WindowPostMessageProxy {
     this.receiveWindow = options.receiveWindow || window;
     this.name = options.name || WindowPostMessageProxy.createRandomString();
     this.logMessages = options.logMessages || false;
-    
+
     // Initialize
     this.handlers = [];
     this.windowMessageHandler = (event: MessageEvent) => this.onMessageReceived(event);
     this.start();
   }
-  
+
   /**
    * Adds handler.
    * If the first handler whose test method returns true will handle the message and provide a response. 
@@ -111,27 +111,27 @@ export class WindowPostMessageProxy {
    */
   removeHandler(handler: IMessageHandler) {
     const handlerIndex = this.handlers.indexOf(handler);
-    if(handlerIndex == -1) {
+    if (handlerIndex == -1) {
       throw new Error(`You attempted to remove a handler but no matching handler was found.`);
     }
-    
+
     this.handlers.splice(handlerIndex, 1);
   }
-  
+
   /**
    * Start listening to message events.
    */
   start() {
     this.receiveWindow.addEventListener('message', this.windowMessageHandler);
   }
-  
+
   /**
    * Stops listening to message events.
    */
   stop() {
     this.receiveWindow.removeEventListener('message', this.windowMessageHandler);
   }
-  
+
   /**
    * Post message to target window with tracking properties added and save deferred object referenced by tracking id.
    */
@@ -139,75 +139,75 @@ export class WindowPostMessageProxy {
     // Add tracking properties to indicate message came from this proxy
     const trackingProperties: ITrackingProperties = { id: WindowPostMessageProxy.createRandomString() };
     this.addTrackingProperties(message, trackingProperties);
-    
-    if(this.logMessages) {
+
+    if (this.logMessages) {
       console.log(`${this.name} Posting message:`);
       console.log(JSON.stringify(message, null, '  '));
     }
-    
+
     this.contentWindow.postMessage(message, "*");
     const deferred = WindowPostMessageProxy.createDeferred();
     this.pendingRequestPromises[trackingProperties.id] = deferred;
-    
+
     return deferred.promise;
   }
-  
+
   /**
    * Send response message to target window.
    * Response messages re-use tracking properties from a previous request message.
    */
   private sendResponse(message: any, trackingProperties: ITrackingProperties): void {
     this.addTrackingProperties(message, trackingProperties);
-    
-    if(this.logMessages) {
+
+    if (this.logMessages) {
       console.log(`${this.name} Sending response:`);
       console.log(JSON.stringify(message, null, '  '));
     }
-    
+
     this.contentWindow.postMessage(message, "*");
   }
-  
+
   /**
    * Message handler.
    */
   private onMessageReceived(event: MessageEvent) {
-    if(this.logMessages) {
+    if (this.logMessages) {
       console.log(`${this.name} Received message:`);
       console.log(`type: ${event.type}`);
       console.log(JSON.stringify(event.data, null, '  '));
     }
-    
-    let message:any = event.data;
+
+    let message: any = event.data;
     let trackingProperties: ITrackingProperties = this.getTrackingProperties(message);
-    
+
     // If this proxy instance could not find tracking properties then disregard message since we can't reliably respond
     if (!trackingProperties) {
       return;
     }
-    
+
     const deferred = this.pendingRequestPromises[trackingProperties.id];
-    
+
     // If message does not have a known ID, treat it as a request
     // Otherwise, treat message as response
     if (!deferred) {
       const handled = this.handlers.some(handler => {
-        if(handler.test(message)) {
+        if (handler.test(message)) {
           Promise.resolve(handler.handle(message))
             .then(responseMessage => {
               this.sendResponse(responseMessage, trackingProperties);
             });
-            
+
           return true;
         }
       });
-      
+
       /**
        * TODO: Consider returning an error message if nothing handled the message.
        * In the case of the Report receiving messages all of them should be handled,
        * however, in the case of the SDK receiving messages it's likely it won't register handlers
        * for all events. Perhaps make this an option at construction time.
        */
-      if(!handled) {
+      if (!handled) {
         console.warn(`Proxy(${this.name}) did not handle message. Handlers: ${this.handlers.length}  Message: ${JSON.stringify(message, null, '')}.`);
         // this.sendResponse({ notHandled: true }, trackingProperties);
       }
@@ -223,7 +223,7 @@ export class WindowPostMessageProxy {
       else {
         deferred.resolve(message);
       }
-      
+
       // TODO: Move to .finally clause up where promise is created for better maitenance like original proxy code.
       delete this.pendingRequestPromises[trackingProperties.id];
     }
@@ -240,17 +240,17 @@ export class WindowPostMessageProxy {
       reject: null,
       promise: null
     };
-    
+
     const promise = new Promise((resolve: () => void, reject: () => void) => {
       deferred.resolve = resolve;
       deferred.reject = reject;
     });
-    
+
     deferred.promise = promise;
-    
+
     return deferred;
   }
-  
+
   /**
    * Utility to generate random sequence of characters used as tracking id for promises.
    */
