@@ -6,7 +6,7 @@
   "typings": "dist/windowPostMessageProxy.d.ts",
   "scripts": {
     "test": "gulp test --chrome",
-    "prepublish": "tsc -p ."
+    "prepublish": "gulp build"
   },
   "repository": {
     "type": "git",

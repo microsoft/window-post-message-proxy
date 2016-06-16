@@ -1,10 +1,8 @@
 module.exports = {  
-  entry: './src/windowPostMessageProxy.ts',
+  entry: './test/windowPostMessageProxy.spec.ts',
   output: {
-    path: __dirname + "/dist",
-    filename: 'windowPostMessageProxy.js',
-    library: 'wpmp',
-    libraryTarget: 'umd'
+    path: __dirname + "/tmp",
+    filename: 'windowPostMessageProxy.spec.js'
   },
   devtool: 'source-map',
   resolve: {
@@ -14,5 +12,8 @@ module.exports = {
     loaders: [
       { test: /\.ts$/, loader: 'ts-loader' }
     ]
+  },
+  ts: {
+    configFileName: "webpack.test.tsconfig.json"
   }
 }
