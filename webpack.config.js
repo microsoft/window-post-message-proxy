@@ -3,7 +3,7 @@ module.exports = {
   output: {
     path: __dirname + "/dist",
     filename: 'windowPostMessageProxy.js',
-    library: 'wpmp',
+    library: 'window-post-message-proxy',
     libraryTarget: 'umd'
   },
   devtool: 'source-map',
