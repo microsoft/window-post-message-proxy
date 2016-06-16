@@ -28,6 +28,8 @@
   "devDependencies": {
     "gulp": "^3.9.1",
     "gulp-help": "^1.6.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-replace": "^0.5.4",
     "gulp-typescript": "^2.13.0",
     "jasmine-core": "^2.4.1",
     "jquery": "^2.2.3",

@@ -1,5 +1,7 @@
 var gulp = require('gulp-help')(require('gulp'));
 var ts = require('gulp-typescript'),
+    rename = require('gulp-rename'),
+    replace = require('gulp-replace'),
     karma = require('karma'),
     webpack = require('webpack-stream'),
     webpackConfig = require('./webpack.config'),
@@ -9,10 +11,12 @@ var ts = require('gulp-typescript'),
     argv = require('yargs').argv
     ;
 
-gulp.task('build', 'Compile source files', function () {
-    return gulp.src(['typings/**/*.d.ts', './src/**/*.ts'])
-        .pipe(webpack(webpackConfig))
-        .pipe(gulp.dest('./dist'));
+gulp.task('build', 'Build for release', function (done) {
+    return runSequence(
+        'compile:ts',
+        'generatecustomdts',
+        done
+    )
 });
 
 gulp.task('test', 'Run all tests', function (done) {
@@ -23,10 +27,25 @@ gulp.task('test', 'Run all tests', function (done) {
     )
 });
 
+gulp.task('compile:ts', 'Compile source files', function () {
+    return gulp.src(['typings/**/*.d.ts', './src/**/*.ts'])
+        .pipe(webpack(webpackConfig))
+        .pipe(gulp.dest('./dist'));
+});
+
 gulp.task('compile:spec', 'Compile typescript for tests', function () {
     return gulp.src(['./test/windowPostMessageProxy.spec.ts'])
         .pipe(webpack(webpackTestConfig))
         .pipe(gulp.dest('./tmp'));
+});
+
+gulp.task('generatecustomdts', 'Generate dts with no exports', function (done) {
+    return gulp.src(['./dist/*.d.ts'])
+        .pipe(replace(/export\s/g, ''))
+        .pipe(rename(function (path) {
+            path.basename = "windowPostMessageProxy-noexports.d";
+        }))
+        .pipe(gulp.dest('dist/'));
 });
 
 gulp.task('test:spec', 'Runs spec tests', function (done) {
