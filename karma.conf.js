@@ -31,6 +31,9 @@ module.exports = function (config) {
                 { type: 'text-summary' }
             ]
         },
-        logLevel: argv.debug ? config.LOG_DEBUG : config.LOG_INFO
+        logLevel: argv.debug ? config.LOG_DEBUG : config.LOG_INFO,
+        client: {
+            args: argv.logMessages ? ['logMessages']: []
+        }
     });
 };
