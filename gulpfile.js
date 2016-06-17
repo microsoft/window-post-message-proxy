@@ -1,6 +1,5 @@
 var gulp = require('gulp-help')(require('gulp'));
-var ts = require('gulp-typescript'),
-    rename = require('gulp-rename'),
+var rename = require('gulp-rename'),
     replace = require('gulp-replace'),
     uglify = require('gulp-uglify'),
     karma = require('karma'),
@@ -8,7 +7,6 @@ var ts = require('gulp-typescript'),
     webpackConfig = require('./webpack.config'),
     webpackTestConfig = require('./webpack.test.config'),
     runSequence = require('run-sequence'),
-    merge2 = require('merge2'),
     argv = require('yargs').argv
     ;
 
@@ -18,7 +16,7 @@ gulp.task('build', 'Build for release', function (done) {
         'min',
         'generatecustomdts',
         done
-    )
+    );
 });
 
 gulp.task('test', 'Run all tests', function (done) {
@@ -26,7 +24,7 @@ gulp.task('test', 'Run all tests', function (done) {
         'compile:spec',
         'test:spec',
         done
-    )
+    );
 });
 
 gulp.task('compile:ts', 'Compile source files', function () {
