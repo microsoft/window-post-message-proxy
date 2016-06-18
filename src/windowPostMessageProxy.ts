@@ -40,6 +40,7 @@ export interface IWindowPostMessageProxyOptions {
   isErrorMessage?: IIsErrorMessage;
   name?: string;
   logMessages?: boolean;
+  eventSourceOverrideWindow?: Window
 }
 
 export class WindowPostMessageProxy {
@@ -68,6 +69,7 @@ export class WindowPostMessageProxy {
   private pendingRequestPromises: IDeferredCache = {};
   private handlers: IMessageHandler[];
   private windowMessageHandler: (e: MessageEvent) => any;
+  private eventSourceOverrideWindow: Window;
 
   constructor(
     options: IWindowPostMessageProxyOptions = {
@@ -87,6 +89,7 @@ export class WindowPostMessageProxy {
     this.receiveWindow = options.receiveWindow || window;
     this.name = options.name || WindowPostMessageProxy.createRandomString();
     this.logMessages = options.logMessages || false;
+    this.eventSourceOverrideWindow = options.eventSourceOverrideWindow;
 
     if(this.logMessages) {
       console.log(`new WindowPostMessageProxy created with name: ${this.name} receiving on window: ${this.receiveWindow.document.title}`);
@@ -177,7 +180,7 @@ export class WindowPostMessageProxy {
       console.log(JSON.stringify(event.data, null, '  '));
     }
 
-    let sendingWindow = event.source;
+    let sendingWindow = this.eventSourceOverrideWindow || event.source;
     let message: any = event.data;
     let trackingProperties: ITrackingProperties = this.getTrackingProperties(message);
 
