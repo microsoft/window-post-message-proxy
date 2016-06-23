@@ -187,12 +187,10 @@ export class WindowPostMessageProxy {
     let message: any = event.data;
     let trackingProperties: ITrackingProperties = this.getTrackingProperties(message);
 
-    // If this proxy instance could not find tracking properties then disregard message since we can't reliably respond
-    if (!trackingProperties) {
-      return;
+    let deferred: IDeferred;
+    if (trackingProperties) { 
+      deferred = this.pendingRequestPromises[trackingProperties.id];
     }
-
-    const deferred = this.pendingRequestPromises[trackingProperties.id];
 
     // If message does not have a known ID, treat it as a request
     // Otherwise, treat message as response
