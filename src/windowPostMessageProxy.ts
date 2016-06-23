@@ -40,7 +40,8 @@ export interface IWindowPostMessageProxyOptions {
   isErrorMessage?: IIsErrorMessage;
   name?: string;
   logMessages?: boolean;
-  eventSourceOverrideWindow?: Window
+  eventSourceOverrideWindow?: Window,
+  suppressMessageNotHandledWarning?: boolean;
 }
 
 export class WindowPostMessageProxy {
@@ -70,6 +71,7 @@ export class WindowPostMessageProxy {
   private handlers: IMessageHandler[];
   private windowMessageHandler: (e: MessageEvent) => any;
   private eventSourceOverrideWindow: Window;
+  private suppressMessageNotHandledWarning: boolean;
 
   constructor(
     options: IWindowPostMessageProxyOptions = {
@@ -90,6 +92,7 @@ export class WindowPostMessageProxy {
     this.name = options.name || WindowPostMessageProxy.createRandomString();
     this.logMessages = options.logMessages || false;
     this.eventSourceOverrideWindow = options.eventSourceOverrideWindow;
+    this.suppressMessageNotHandledWarning = options.suppressMessageNotHandledWarning || false;
 
     if(this.logMessages) {
       console.log(`new WindowPostMessageProxy created with name: ${this.name} receiving on window: ${this.receiveWindow.document.title}`);
@@ -211,7 +214,7 @@ export class WindowPostMessageProxy {
        * however, in the case of the SDK receiving messages it's likely it won't register handlers
        * for all events. Perhaps make this an option at construction time.
        */
-      if (!handled) {
+      if (!handled && !this.suppressMessageNotHandledWarning) {
         console.warn(`Proxy(${this.name}) did not handle message. Handlers: ${this.handlers.length}  Message: ${JSON.stringify(message, null, '')}.`);
         // this.sendResponse({ notHandled: true }, trackingProperties);
       }

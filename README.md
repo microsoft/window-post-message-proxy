@@ -119,3 +119,11 @@ You can provided a name by passing `name: 'Iframe'` in the options object.
 ```
 const windowPostMessageProxy = new WindowPostMessageProxy({ name: 'Iframe' });
 ```
+
+### Supress Warning Message about unhandled messages
+By default the window post message proxy will warn you if it received a message that was not handled since this is usually an indication of error; however,
+if you are register multiple window message handlers the message may handled but it's just not able to be known by the windowPostMessageProxy and this warning no longer applies.
+
+```
+const windowPostMessageProxy = new WindowPostMessageProxy({ suppressMessageNotHandledWarning: true });
+```
