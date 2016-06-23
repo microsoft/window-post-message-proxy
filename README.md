@@ -15,14 +15,14 @@ npm install --save window-post-message-proxy
 ```
 // Setup
 const iframe = document.getElementById("myFrame");
-const windowPostMessageProxy = new WindowPostMessageProxy(iframe.contentWindow);
+const windowPostMessageProxy = new WindowPostMessageProxy();
 
 // Send message
 const message = {
     key: "Value"
 };
 
-windowPostMessageProxy.postMessage(message)
+windowPostMessageProxy.postMessage(iframe.conentWindow, message)
     .then(response => {
         
     });
@@ -40,7 +40,7 @@ const message = {
     key: "Value"
 };
 
-windowPostMessageProxy.postMessage(message);
+windowPostMessageProxy.postMessage(iframe.conentWindow, message);
 ```
 The message is actually modified before it's sent to become:
 ```
@@ -79,7 +79,7 @@ const customProcessTrackingProperties = {
         };
     }
 };
-const windowPostMessageProxy = new WindowPostMessageProxy(iframe.contentWindow, customProcessTrackingProperties);
+const windowPostMessageProxy = new WindowPostMessageProxy(customProcessTrackingProperties);
 ```
 
 ### Customizing how messages are detected as error responses.
@@ -99,5 +99,23 @@ function isErrorMessage(message: any) {
     return !(200 <= message.status && message.status < 300);
 }
 
-const windowPostMessageProxy = new WindowPostMessageProxy(iframe.contentWindow,  { isErrorMessage });
+const windowPostMessageProxy = new WindowPostMessageProxy({ isErrorMessage });
+```
+
+### Logging messages
+
+By default messagse are not logged, but you can override this behavior by passing `logMessages: true` in the options object.
+```
+const windowPostMessageProxy = new WindowPostMessageProxy({ logMessages: true });
+```
+This will print out a stringified JSON of each object that is recieved or sent by the specific instance.
+
+### Supplying custom name
+Each windowPostMessageProxy gives itself a randomly generated name so you can see which instance is communicating in the log messages.
+Oftem times you may want to pass a custom name which window the windowPostMessageProxy instance is running.
+
+You can provided a name by passing `name: 'Iframe'` in the options object.
+
+```
+const windowPostMessageProxy = new WindowPostMessageProxy({ name: 'Iframe' });
 ```
