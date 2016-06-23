@@ -285,52 +285,5 @@ describe('windowPostMessageProxy', function () {
 
       // Cleanup
     });
-
   });
-
-  // // Goal is to test entire post message protocol against live embed page by sending messages and testing response.
-  // // Although this library is suppose to be indepdent of PowerBI's particular use case so these tests should probably live with ReportEmbed pages tests.
-  // xdescribe('test with actual report embed page', function () {
-  //   let windowPostMessageProxy: wpmp.WindowPostMessageProxy;
-  //   let iframe: HTMLIFrameElement;
-  //   let iframeLoaded: JQueryPromise<void>;
-
-  //   beforeAll(function () {
-  //     const iframeSrc = "http://embed.powerbi.com/appTokenReportEmbed";
-  //     const $iframe = $(`<iframe src="${iframeSrc}" id="testiframe"></iframe>`).appendTo(document.body);
-  //     iframe = <HTMLIFrameElement>$iframe.get(0);
-  //     windowPostMessageProxy = new wpmp.WindowPostMessageProxy(window);
-
-  //     const iframeLoadedDeferred = $.Deferred<void>();
-  //     iframe.addEventListener('load', () => {
-  //       iframeLoadedDeferred.resolve();
-  //     });
-  //     iframeLoaded = iframeLoadedDeferred.promise();
-  //   });
-
-  //   afterAll(function () {
-  //     // Choose to leave iframe in window, for easier debugging of the tests. Specifically to make sure correct html page was loaded.
-  //     // $('#testiframe').remove();
-  //   });
-
-  //   it('', function (done) {
-  //     // Arrange
-  //     const testData = {
-  //       message: {
-  //         error: true
-  //       }
-  //     };
-
-  //     // Act
-  //     // Assert
-  //     iframeLoaded
-  //       .then(() => {
-  //         windowPostMessageProxy.postMessage(testData.message)
-  //           .catch((message:any) => {
-  //             expect(message.error).toEqual(true);
-  //             done();
-  //           });
-  //       });
-
-  // });
 });
