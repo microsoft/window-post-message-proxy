@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://pbix.visualstudio.com/DefaultCollection/PaaS/_git/window-post-message-proxy"
+    "url": "https://github.com/Microsoft/window-post-message-proxy"
   },
   "keywords": [
     "window",
