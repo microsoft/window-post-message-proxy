@@ -1,5 +1,6 @@
 var gulp = require('gulp-help')(require('gulp'));
 var del = require('del'),
+    header = require('gulp-header'),
     rename = require('gulp-rename'),
     replace = require('gulp-replace'),
     uglify = require('gulp-uglify'),
@@ -11,12 +12,16 @@ var del = require('del'),
     argv = require('yargs').argv
     ;
 
+var package = require('./package.json');
+var banner = "/*! <%= package.name %> v<%= package.version %> | (c) 2016 Microsoft Corporation <%= package.license %> */\n";
+
 gulp.task('build', 'Build for release', function (done) {
     return runSequence(
         'clean:dist',
         'compile:ts',
         'min',
         'generatecustomdts',
+        'header',
         done
     );
 });
@@ -33,6 +38,12 @@ gulp.task('test', 'Run all tests', function (done) {
 gulp.task('compile:ts', 'Compile source files', function () {
     return gulp.src(['typings/**/*.d.ts', './src/**/*.ts'])
         .pipe(webpack(webpackConfig))
+        .pipe(gulp.dest('./dist'));
+});
+
+gulp.task('header', 'Add header to distributed files', function () {
+    return gulp.src(['!./dist/*.map', './dist/*'])
+        .pipe(header(banner, { package : package }))
         .pipe(gulp.dest('./dist'));
 });
 
