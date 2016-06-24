@@ -26,6 +26,7 @@
     "es6-promise": "^3.1.2"
   },
   "devDependencies": {
+    "del": "^2.2.1",
     "gulp": "^3.9.1",
     "gulp-help": "^1.6.1",
     "gulp-rename": "^1.2.2",
