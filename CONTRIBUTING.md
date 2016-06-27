@@ -4,7 +4,7 @@
 
 Clone the repository:
 ```
-git clone https://pbix.visualstudio.com/DefaultCollection/PaaS/Integrate/_git/window-post-message-proxy
+git clone https://github.com/Microsoft/window-post-message-proxy
 ```
 
 Install global dependencies if needed:
@@ -20,7 +20,7 @@ typings install
 
 ## Building
 ```
-tsc -p .
+gulp build
 ```
 Or if using VS Code: `Ctrl + Shift + B`
 
