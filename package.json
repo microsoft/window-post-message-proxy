@@ -12,6 +12,9 @@
     "type": "git",
     "url": "https://github.com/Microsoft/window-post-message-proxy"
   },
+  "files": [
+    "dist"
+  ],
   "keywords": [
     "window",
     "post",
