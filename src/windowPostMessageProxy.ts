@@ -199,7 +199,9 @@ export class WindowPostMessageProxy {
         if (handler.test(message)) {
           Promise.resolve(handler.handle(message))
             .then(responseMessage => {
-              this.sendResponse(sendingWindow, responseMessage, trackingProperties);
+              if (responseMessage) {
+                this.sendResponse(sendingWindow, responseMessage, trackingProperties);
+              }
             });
 
           return true;
