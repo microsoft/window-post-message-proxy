@@ -5,7 +5,8 @@ var del = require('del'),
     replace = require('gulp-replace'),
     uglify = require('gulp-uglify'),
     karma = require('karma'),
-    webpack = require('webpack-stream'),
+    webpack = require('webpack'),
+    webpackStream = require('webpack-stream'),
     webpackConfig = require('./webpack.config'),
     webpackTestConfig = require('./webpack.test.config'),
     runSequence = require('run-sequence'),
@@ -13,7 +14,8 @@ var del = require('del'),
     ;
 
 var package = require('./package.json');
-var banner = "/*! <%= package.name %> v<%= package.version %> | (c) 2016 Microsoft Corporation <%= package.license %> */\n";
+var webpackBanner = package.name + " v" + package.version + " | (c) 2016 Microsoft Corporation " + package.license;
+var gulpBanner = "/*! " + webpackBanner + " */\n";
 
 gulp.task('build', 'Build for release', function (done) {
     return runSequence(
@@ -36,20 +38,26 @@ gulp.task('test', 'Run all tests', function (done) {
 });
 
 gulp.task('compile:ts', 'Compile source files', function () {
+    webpackConfig.plugins = [
+        new webpack.BannerPlugin(webpackBanner)
+    ];
+
     return gulp.src(['typings/**/*.d.ts', './src/**/*.ts'])
-        .pipe(webpack(webpackConfig))
+        .pipe(webpackStream(webpackConfig))
         .pipe(gulp.dest('./dist'));
 });
 
 gulp.task('header', 'Add header to distributed files', function () {
-    return gulp.src(['!./dist/*.map', './dist/*'])
-        .pipe(header(banner, { package : package }))
+    return gulp.src(['./dist/*.d.ts'])
+        .pipe(header(gulpBanner))
         .pipe(gulp.dest('./dist'));
 });
 
 gulp.task('min', 'Minify build files', function () {
     return gulp.src(['./dist/*.js'])
-        .pipe(uglify())
+        .pipe(uglify({
+            preserveComments: 'license'
+        }))
         .pipe(rename({
             suffix: '.min'
         }))
@@ -70,7 +78,7 @@ gulp.task('clean:tmp', 'Clean tmp directory', function () {
 
 gulp.task('compile:spec', 'Compile typescript for tests', function () {
     return gulp.src(['./test/windowPostMessageProxy.spec.ts'])
-        .pipe(webpack(webpackTestConfig))
+        .pipe(webpackStream(webpackTestConfig))
         .pipe(gulp.dest('./tmp'));
 });
 
