@@ -379,33 +379,6 @@ describe('windowPostMessageProxy', function () {
       spyHandler.handle.calls.reset();
     });
 
-    it('if wpmp receives a message that is not an object it is ignored', function (done) {
-      // Arrange
-      const testData = {
-        message: {
-          messageTest: "abc123"
-        },
-        responseMessage: {
-          handled: true,
-          messageTest: "abc123"
-        }
-      };
-
-      // Act
-      iframeLoaded
-        .then(() => {
-          windowPostMessageProxy.postMessage(iframe.contentWindow, JSON.stringify(testData.message));
-
-          setTimeout(() => {
-            // Assert
-            expect(badGetTrackingPropertiesSpy).not.toHaveBeenCalled();
-            expect(badAddTrackingPropertiesSpy).not.toHaveBeenCalled();
-            expect(spyHandler.handle).not.toHaveBeenCalled();
-            done();
-          }, 100);
-        });
-    });
-
     it('if provided getTrackingProperties method throws an error catch it and warn in console', function (done) {
       // Arrange
       const testData = {
