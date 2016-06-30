@@ -41,7 +41,7 @@ export interface IWindowPostMessageProxyOptions {
   name?: string;
   logMessages?: boolean;
   eventSourceOverrideWindow?: Window,
-  suppressMessageNotHandledWarning?: boolean;
+  suppressWarnings?: boolean;
 }
 
 export class WindowPostMessageProxy {
@@ -71,7 +71,7 @@ export class WindowPostMessageProxy {
   private handlers: IMessageHandler[];
   private windowMessageHandler: (e: MessageEvent) => any;
   private eventSourceOverrideWindow: Window;
-  private suppressMessageNotHandledWarning: boolean;
+  private suppressWarnings: boolean;
 
   constructor(
     options: IWindowPostMessageProxyOptions = {
@@ -92,9 +92,9 @@ export class WindowPostMessageProxy {
     this.name = options.name || WindowPostMessageProxy.createRandomString();
     this.logMessages = options.logMessages || false;
     this.eventSourceOverrideWindow = options.eventSourceOverrideWindow;
-    this.suppressMessageNotHandledWarning = options.suppressMessageNotHandledWarning || false;
+    this.suppressWarnings = options.suppressWarnings || false;
 
-    if(this.logMessages) {
+    if (this.logMessages) {
       console.log(`new WindowPostMessageProxy created with name: ${this.name} receiving on window: ${this.receiveWindow.document.title}`);
     }
 
@@ -186,17 +186,21 @@ export class WindowPostMessageProxy {
     let sendingWindow = this.eventSourceOverrideWindow || event.source;
     let message: any = event.data;
 
-    if(typeof message !== "object") {
-      console.warn(`Proxy(${this.name}): Received message that was not an object. Discarding message`);
+    if (typeof message !== "object") {
+      if (!this.suppressWarnings) {
+        console.warn(`Proxy(${this.name}): Received message that was not an object. Discarding message`);
+      }
       return;
     }
 
     let trackingProperties: ITrackingProperties;
     try {
-      trackingProperties = this.getTrackingProperties(message); 
+      trackingProperties = this.getTrackingProperties(message);
     }
     catch (e) {
-      console.warn(`Proxy(${this.name}): Error occurred when attempting to get tracking properties from incoming message:`, JSON.stringify(message, null, '  '), "Error: ", e);
+      if (!this.suppressWarnings) {
+        console.warn(`Proxy(${this.name}): Error occurred when attempting to get tracking properties from incoming message:`, JSON.stringify(message, null, '  '), "Error: ", e);
+      }
     }
 
     let deferred: IDeferred;
@@ -213,7 +217,9 @@ export class WindowPostMessageProxy {
           canMessageBeHandled = handler.test(message);
         }
         catch (e) {
-          console.warn(`Proxy(${this.name}): Error occurred when handler was testing incoming message:`, JSON.stringify(message, null, '  '), "Error: ", e);
+          if (!this.suppressWarnings) {
+            console.warn(`Proxy(${this.name}): Error occurred when handler was testing incoming message:`, JSON.stringify(message, null, '  '), "Error: ", e);
+          }
         }
 
         if (canMessageBeHandled) {
@@ -223,15 +229,19 @@ export class WindowPostMessageProxy {
             responseMessagePromise = Promise.resolve(handler.handle(message));
           }
           catch (e) {
-            console.warn(`Proxy(${this.name}): Error occurred when handler was processing incoming message:`, JSON.stringify(message, null, '  '), "Error: ", e);
+            if (!this.suppressWarnings) {
+              console.warn(`Proxy(${this.name}): Error occurred when handler was processing incoming message:`, JSON.stringify(message, null, '  '), "Error: ", e);
+            }
             responseMessagePromise = Promise.resolve();
           }
-          
+
           responseMessagePromise
             .then(responseMessage => {
-              if(!responseMessage) {
+              if (!responseMessage) {
                 const warningMessage = `Handler for message: ${JSON.stringify(message, null, '  ')} did not return a response message. The default response message will be returned instead.`;
-                console.warn(`Proxy(${this.name}): ${warningMessage}`);
+                if (!this.suppressWarnings) {
+                  console.warn(`Proxy(${this.name}): ${warningMessage}`);
+                }
                 responseMessage = {
                   warning: warningMessage,
                   originalMessage: message
@@ -250,7 +260,7 @@ export class WindowPostMessageProxy {
        * however, in the case of the SDK receiving messages it's likely it won't register handlers
        * for all events. Perhaps make this an option at construction time.
        */
-      if (!handled && !this.suppressMessageNotHandledWarning) {
+      if (!handled && !this.suppressWarnings) {
         console.warn(`Proxy(${this.name}) did not handle message. Handlers: ${this.handlers.length}  Message: ${JSON.stringify(message, null, '')}.`);
         // this.sendResponse({ notHandled: true }, trackingProperties);
       }
@@ -267,7 +277,7 @@ export class WindowPostMessageProxy {
       catch (e) {
         console.warn(`Proxy(${this.name}) Error occurred when trying to determine if message is consider an error response. Message: `, JSON.stringify(message, null, ''), 'Error: ', e);
       }
-      
+
       if (isErrorMessage) {
         deferred.reject(message);
       }
