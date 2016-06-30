@@ -553,4 +553,87 @@ describe('windowPostMessageProxy', function () {
     });
   });
 
+  describe('should return a default response message if the handler provided does not return a response message so the promise of consumer is will still be resolved', function () {
+    let windowPostMessageProxy: wpmp.WindowPostMessageProxy;
+    let iframeWindowPostMessageProxy: wpmp.WindowPostMessageProxy;
+    let handler: wpmp.IMessageHandler;
+    let spyHandler: {
+      test: jasmine.Spy,
+      handle: jasmine.Spy
+    };
+    let iframe: HTMLIFrameElement;
+    let iframeLoaded: Promise<void>;
+
+    beforeAll(function () {
+      
+      const iframeSrc = "base/test/utility/noop.html";
+      const $iframe = $(`<iframe src="${iframeSrc}"></iframe>`).appendTo(document.body);
+      iframe = <HTMLIFrameElement>$iframe.get(0);
+
+      windowPostMessageProxy = new wpmp.WindowPostMessageProxy({
+        name: "hostProxyDefaultNoHandlers",
+        logMessages
+      });
+
+      iframeWindowPostMessageProxy = new wpmp.WindowPostMessageProxy({
+        receiveWindow: iframe.contentWindow,
+        name: "iframeProxyWithHandler",
+        logMessages
+      });
+
+      handler = {
+        test: jasmine.createSpy("testSpy").and.returnValue(true),
+        handle: jasmine.createSpy("handleSpy").and.callFake(function (message: any) {
+          console.log('Spy handler called');
+        })
+      };
+
+      spyHandler = <any>handler;
+
+      iframeWindowPostMessageProxy.addHandler(handler);
+
+      iframeLoaded = new Promise<void>(resolve => {
+        iframe.addEventListener('load', () => {
+          resolve();
+        });
+      });
+    });
+
+    afterAll(function () {
+      windowPostMessageProxy.stop();
+    });
+
+    beforeEach(() => {
+      // empty
+    });
+
+    afterEach(function () {
+      spyHandler.test.calls.reset();
+      spyHandler.handle.calls.reset();
+    });
+
+    it('if handler which processes message does not return a response, return the default response message', function (done) {
+      // Arrange
+      const testData = {
+        message: {
+          messageTest: "abc123"
+        },
+        responseMessage: {
+          handled: true,
+          messageTest: "abc123"
+        }
+      };
+
+      // Act
+      iframeLoaded
+        .then(() => {
+          windowPostMessageProxy.postMessage(iframe.contentWindow, testData.message)
+            .then((response: any) => {
+              expect(response.warning).toBeDefined();
+              expect(response.originalMessage).toEqual(testData.message);
+              done();
+            });
+        });
+    });
+  });
 });

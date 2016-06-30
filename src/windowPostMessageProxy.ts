@@ -229,6 +229,14 @@ export class WindowPostMessageProxy {
           
           responseMessagePromise
             .then(responseMessage => {
+              if(!responseMessage) {
+                const warningMessage = `Handler for message: ${JSON.stringify(message, null, '  ')} did not return a response message. The default response message will be returned instead.`;
+                console.warn(`Proxy(${this.name}): ${warningMessage}`);
+                responseMessage = {
+                  warning: warningMessage,
+                  originalMessage: message
+                };
+              }
               this.sendResponse(sendingWindow, responseMessage, trackingProperties);
             });
 
