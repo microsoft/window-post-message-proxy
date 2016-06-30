@@ -1,4 +1,5 @@
 # window-post-message-proxy
+[![Build Status](https://travis-ci.com/Microsoft/window-post-message-proxy.svg?token=nXyWFYxRu6tVxUMJAuJr&branch=master)](https://travis-ci.com/Microsoft/window-post-message-proxy)
 
 A library used in place of the native window.postMessage which when used on both the sending and receiving windows allow for a nicer asynchronouse promise messaging between the windows.
 
