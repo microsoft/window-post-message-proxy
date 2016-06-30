@@ -286,4 +286,271 @@ describe('windowPostMessageProxy', function () {
       // Cleanup
     });
   });
+
+  describe('should catch errors thrown by functions provided by consumers', function () {
+    let windowPostMessageProxy: wpmp.WindowPostMessageProxy;
+    let iframeWindowPostMessageProxy: wpmp.WindowPostMessageProxy;
+    let handler: wpmp.IMessageHandler;
+    let spyHandler: {
+      test: jasmine.Spy,
+      handle: jasmine.Spy
+    };
+    let iframe: HTMLIFrameElement;
+    let iframeLoaded: Promise<void>;
+    let badAddTrackingProperties: wpmp.IAddTrackingProperties = (message: any, trackingProperties: wpmp.ITrackingProperties) => {
+      throw new Error(`Forced error thrown by bad addTrackingProperties method`);
+    };
+    let badAddTrackingPropertiesSpy = jasmine.createSpy("addTrackingPropertiesSpy").and.callFake(badAddTrackingProperties);
+    let badGetTrackingProperties: wpmp.IGetTrackingProperties = (message: any): wpmp.ITrackingProperties => {
+      throw new Error(`Forced error thrown by bad getTrackingProperties method`);
+    };
+    let badGetTrackingPropertiesSpy = jasmine.createSpy("getTrackingPropertiesSpy").and.callFake(badGetTrackingProperties);
+    let badIsErrorMessage: wpmp.IIsErrorMessage = (message: any): boolean => {
+      throw new Error(`Forced error thrown by bad isErrorMessage method`);
+    };
+    let badIsErrorMessageSpy = jasmine.createSpy("isErrorMessageSpy").and.callFake(badIsErrorMessage);
+    let warnSpy: jasmine.Spy;
+
+    beforeAll(function () {
+      warnSpy = spyOn(console, "warn");
+      
+      const iframeSrc = "base/test/utility/noop.html";
+      const $iframe = $(`<iframe src="${iframeSrc}"></iframe>`).appendTo(document.body);
+      iframe = <HTMLIFrameElement>$iframe.get(0);
+
+      windowPostMessageProxy = new wpmp.WindowPostMessageProxy({
+        name: "hostProxyDefaultNoHandlers",
+        logMessages,
+        isErrorMessage: badIsErrorMessageSpy,
+        processTrackingProperties: {
+          addTrackingProperties: (message: any, trackingProperties: wpmp.ITrackingProperties) => {
+            if(typeof message !== "object") {
+              return;
+            }
+
+            return wpmp.WindowPostMessageProxy.defaultAddTrackingProperties(message, trackingProperties);
+          },
+          getTrackingProperties: wpmp.WindowPostMessageProxy.defaultGetTrackingProperties
+        }
+      });
+
+      iframeWindowPostMessageProxy = new wpmp.WindowPostMessageProxy({
+        receiveWindow: iframe.contentWindow,
+        name: "iframeProxyWithHandler",
+        logMessages,
+        processTrackingProperties: {
+          addTrackingProperties: badAddTrackingPropertiesSpy,
+          getTrackingProperties: badGetTrackingPropertiesSpy
+        }
+      });
+
+      handler = {
+        test: jasmine.createSpy("testSpy").and.returnValue(true),
+        handle: jasmine.createSpy("handleSpy").and.callFake(function (message: any) {
+          message.handled = true;
+          return message;
+        })
+      };
+
+      spyHandler = <any>handler;
+
+      iframeWindowPostMessageProxy.addHandler(handler);
+
+      iframeLoaded = new Promise<void>(resolve => {
+        iframe.addEventListener('load', () => {
+          resolve();
+        });
+      });
+    });
+
+    afterAll(function () {
+      windowPostMessageProxy.stop();
+    });
+
+    beforeEach(() => {
+      // empty
+    });
+
+    afterEach(function () {
+      badGetTrackingPropertiesSpy.calls.reset();
+      badAddTrackingPropertiesSpy.calls.reset();
+      warnSpy.calls.reset();
+      spyHandler.test.calls.reset();
+      spyHandler.handle.calls.reset();
+    });
+
+    it('if wpmp receives a message that is not an object it is ignored', function (done) {
+      // Arrange
+      const testData = {
+        message: {
+          messageTest: "abc123"
+        },
+        responseMessage: {
+          handled: true,
+          messageTest: "abc123"
+        }
+      };
+
+      // Act
+      iframeLoaded
+        .then(() => {
+          windowPostMessageProxy.postMessage(iframe.contentWindow, JSON.stringify(testData.message));
+
+          setTimeout(() => {
+            // Assert
+            expect(badGetTrackingPropertiesSpy).not.toHaveBeenCalled();
+            expect(badAddTrackingPropertiesSpy).not.toHaveBeenCalled();
+            expect(spyHandler.handle).not.toHaveBeenCalled();
+            done();
+          }, 100);
+        });
+    });
+
+    it('if provided getTrackingProperties method throws an error catch it and warn in console', function (done) {
+      // Arrange
+      const testData = {
+        message: {
+          messageTest: "abc123"
+        },
+        responseMessage: {
+          handled: true,
+          messageTest: "abc123"
+        }
+      };
+
+      // Act
+      iframeLoaded
+        .then(() => {
+          badGetTrackingPropertiesSpy.and.callFake(badGetTrackingProperties);
+          windowPostMessageProxy.postMessage(iframe.contentWindow, testData.message)
+
+          setTimeout(() => {
+              // Assert
+              expect(badGetTrackingPropertiesSpy).toHaveBeenCalled();
+              expect(warnSpy).toHaveBeenCalled();
+              done();
+          }, 100);
+        });
+    });
+
+    it('if provided addTrackingProperties method throws an error catch it and warn in console', function (done) {
+      // Arrange
+      const testData = {
+        message: {
+          messageTest: "abc123"
+        },
+        responseMessage: {
+          handled: true,
+          messageTest: "abc123"
+        }
+      };
+
+      // Act
+      iframeLoaded
+        .then(() => {
+          badAddTrackingPropertiesSpy.and.callFake(badAddTrackingProperties);
+          windowPostMessageProxy.postMessage(iframe.contentWindow, testData.message)
+
+          setTimeout(() => {
+              // Assert
+              expect(badAddTrackingPropertiesSpy).toHaveBeenCalled();
+              expect(warnSpy).toHaveBeenCalled();
+              done();
+          }, 100);
+        });
+    });
+  });
+
+  describe('should catch errors thrown by isErrorMessage function provided by consumers', function () {
+    let windowPostMessageProxy: wpmp.WindowPostMessageProxy;
+    let iframeWindowPostMessageProxy: wpmp.WindowPostMessageProxy;
+    let handler: wpmp.IMessageHandler;
+    let spyHandler: {
+      test: jasmine.Spy,
+      handle: jasmine.Spy
+    };
+    let iframe: HTMLIFrameElement;
+    let iframeLoaded: Promise<void>;
+    let badIsErrorMessage: wpmp.IIsErrorMessage = (message: any): boolean => {
+      throw new Error(`Forced error thrown by bad isErrorMessage method`);
+    };
+    let badIsErrorMessageSpy = jasmine.createSpy("isErrorMessageSpy").and.callFake(badIsErrorMessage);
+
+    beforeAll(function () {
+      
+      const iframeSrc = "base/test/utility/noop.html";
+      const $iframe = $(`<iframe src="${iframeSrc}"></iframe>`).appendTo(document.body);
+      iframe = <HTMLIFrameElement>$iframe.get(0);
+
+      windowPostMessageProxy = new wpmp.WindowPostMessageProxy({
+        name: "hostProxyDefaultNoHandlers",
+        logMessages,
+        isErrorMessage: badIsErrorMessageSpy
+      });
+
+      iframeWindowPostMessageProxy = new wpmp.WindowPostMessageProxy({
+        receiveWindow: iframe.contentWindow,
+        name: "iframeProxyWithHandler",
+        logMessages
+      });
+
+      handler = {
+        test: jasmine.createSpy("testSpy").and.returnValue(true),
+        handle: jasmine.createSpy("handleSpy").and.callFake(function (message: any) {
+          message.handled = true;
+          return message;
+        })
+      };
+
+      spyHandler = <any>handler;
+
+      iframeWindowPostMessageProxy.addHandler(handler);
+
+      iframeLoaded = new Promise<void>(resolve => {
+        iframe.addEventListener('load', () => {
+          resolve();
+        });
+      });
+    });
+
+    afterAll(function () {
+      windowPostMessageProxy.stop();
+    });
+
+    beforeEach(() => {
+      // empty
+    });
+
+    afterEach(function () {
+      badIsErrorMessageSpy.calls.reset();
+      spyHandler.test.calls.reset();
+      spyHandler.handle.calls.reset();
+    });
+
+    it('if provided isErrorMessage method throws an error catch it and warn in console', function (done) {
+      // Arrange
+      const testData = {
+        message: {
+          messageTest: "abc123"
+        },
+        responseMessage: {
+          handled: true,
+          messageTest: "abc123"
+        }
+      };
+
+      // Act
+      iframeLoaded
+        .then(() => {
+          windowPostMessageProxy.postMessage(iframe.contentWindow, testData.message)
+
+          setTimeout(() => {
+              // Assert
+              expect(badIsErrorMessageSpy).toHaveBeenCalled();
+              done();
+          }, 100);
+        });
+    });
+  });
+
 });

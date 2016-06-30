@@ -185,10 +185,22 @@ export class WindowPostMessageProxy {
 
     let sendingWindow = this.eventSourceOverrideWindow || event.source;
     let message: any = event.data;
-    let trackingProperties: ITrackingProperties = this.getTrackingProperties(message);
+
+    if(typeof message !== "object") {
+      console.warn(`Proxy(${this.name}): Received message that was not an object. Discarding message`);
+      return;
+    }
+
+    let trackingProperties: ITrackingProperties;
+    try {
+      trackingProperties = this.getTrackingProperties(message); 
+    }
+    catch (e) {
+      console.warn(`Proxy(${this.name}): Error occurred when attempting to get tracking properties from incoming message:`, JSON.stringify(message, null, '  '), "Error: ", e);
+    }
 
     let deferred: IDeferred;
-    if (trackingProperties) { 
+    if (trackingProperties) {
       deferred = this.pendingRequestPromises[trackingProperties.id];
     }
 
@@ -196,8 +208,26 @@ export class WindowPostMessageProxy {
     // Otherwise, treat message as response
     if (!deferred) {
       const handled = this.handlers.some(handler => {
-        if (handler.test(message)) {
-          Promise.resolve(handler.handle(message))
+        let canMessageBeHandled = false;
+        try {
+          canMessageBeHandled = handler.test(message);
+        }
+        catch (e) {
+          console.warn(`Proxy(${this.name}): Error occurred when handler was testing incoming message:`, JSON.stringify(message, null, '  '), "Error: ", e);
+        }
+
+        if (canMessageBeHandled) {
+          let responseMessagePromise: Promise<any>;
+
+          try {
+            responseMessagePromise = Promise.resolve(handler.handle(message));
+          }
+          catch (e) {
+            console.warn(`Proxy(${this.name}): Error occurred when handler was processing incoming message:`, JSON.stringify(message, null, '  '), "Error: ", e);
+            responseMessagePromise = Promise.resolve();
+          }
+          
+          responseMessagePromise
             .then(responseMessage => {
               this.sendResponse(sendingWindow, responseMessage, trackingProperties);
             });
@@ -222,7 +252,15 @@ export class WindowPostMessageProxy {
        * If error message reject promise,
        * Otherwise, resolve promise
        */
-      if (this.isErrorMessage(message)) {
+      let isErrorMessage = true;
+      try {
+        isErrorMessage = this.isErrorMessage(message)
+      }
+      catch (e) {
+        console.warn(`Proxy(${this.name}) Error occurred when trying to determine if message is consider an error response. Message: `, JSON.stringify(message, null, ''), 'Error: ', e);
+      }
+      
+      if (isErrorMessage) {
         deferred.reject(message);
       }
       else {
