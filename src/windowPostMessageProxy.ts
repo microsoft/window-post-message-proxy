@@ -186,15 +186,9 @@ export class WindowPostMessageProxy {
     let sendingWindow = this.eventSourceOverrideWindow || event.source;
     let message: any = event.data;
 
-    if (typeof message !== "object") {
-      if (!this.suppressWarnings) {
-        console.warn(`Proxy(${this.name}): Received message that was not an object. Discarding message`);
-      }
-      return;
-    }
-
     let trackingProperties: ITrackingProperties;
     try {
+      message = this.isJsonString(message) ? JSON.parse(message) : message;
       trackingProperties = this.getTrackingProperties(message);
     }
     catch (e) {
@@ -317,5 +311,14 @@ export class WindowPostMessageProxy {
    */
   private static createRandomString(): string {
     return (Math.random() + 1).toString(36).substring(7);
+  }
+
+  private isJsonString(jsonString: any): boolean {
+    try {
+        JSON.parse(jsonString);
+    } catch (e) {
+        return false;
+    }
+    return true;  
   }
 }
