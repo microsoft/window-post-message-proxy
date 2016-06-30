@@ -24,8 +24,8 @@ describe('windowPostMessageProxy', function () {
 
     beforeAll(function () {
       const iframeSrc = "base/test/utility/noop.html";
-      const $iframe = $(`<iframe src="${iframeSrc}" id="testiframe"></iframe>`).appendTo(document.body);
-      const $iframe2 = $(`<iframe src="${iframeSrc}" id="testiframe"></iframe>`).appendTo(document.body);
+      const $iframe = $(`<iframe src="${iframeSrc}"></iframe>`).appendTo(document.body);
+      const $iframe2 = $(`<iframe src="${iframeSrc}"></iframe>`).appendTo(document.body);
       iframe = <HTMLIFrameElement>$iframe.get(0);
       iframe2 = <HTMLIFrameElement>$iframe2.get(0);
 
