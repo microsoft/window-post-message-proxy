@@ -1,0 +1,251 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>window-post-message-proxy</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+	<script src="assets/js/modernizr.js"></script>
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.js" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">window-post-message-proxy</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1> window-post-message-proxy</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<h1 id="window-post-message-proxy">window-post-message-proxy</h1>
+				<p><a href="https://travis-ci.com/Microsoft/window-post-message-proxy"><img src="https://travis-ci.com/Microsoft/window-post-message-proxy.svg?token=nXyWFYxRu6tVxUMJAuJr&amp;branch=master" alt="Build Status"></a></p>
+				<p>A library used in place of the native window.postMessage which when used on both the sending and receiving windows allow for a nicer asynchronouse promise messaging between the windows.</p>
+				<p>When sending messages using the proxy, it will apply a unique id to the message, create a deferred object referenced by the id, and pass the message on to the target window.
+					The target window will also have an instance of the windowPostMessage proxy setup which will send back messages and preserve the unique id.
+				Then the original sending instance receives the response messag with id, it will look to see if there is matching id in cache and if so resolve the deferred object with the response.</p>
+				<h2 id="installation">Installation</h2>
+				<pre><code class="lang-bash">npm install --save window-post-message-proxy
+</code></pre>
+				<h2 id="basic-usage">Basic Usage</h2>
+				<pre><code class="lang-typescript"><span class="hljs-comment">// Setup</span>
+<span class="hljs-keyword">const</span> iframe = <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">"myFrame"</span>);
+<span class="hljs-keyword">const</span> windowPostMessageProxy = <span class="hljs-keyword">new</span> WindowPostMessageProxy();
+
+<span class="hljs-comment">// Send message</span>
+<span class="hljs-keyword">const</span> message = {
+    key: <span class="hljs-string">"Value"</span>
+};
+
+windowPostMessageProxy.postMessage(iframe.conentWindow, message)
+    .then(response =&gt; {
+
+    });
+</code></pre>
+				<h2 id="advanced-customization">Advanced Customization</h2>
+				<h3 id="customizing-how-tracking-properties-are-added-to-the-method">Customizing how tracking properties are added to the method</h3>
+				<p>By default the windowPostMessage proxy will store the tracking properties as object on the message by known property: <code>windowPostMesssageProxy</code>.</p>
+				<p>This means if you call:</p>
+				<pre><code class="lang-typescript"><span class="hljs-keyword">const</span> message = {
+    key: <span class="hljs-string">"Value"</span>
+};
+
+windowPostMessageProxy.postMessage(iframe.conentWindow, message);
+</code></pre>
+				<p>The message is actually modified before it&#39;s sent to become:</p>
+				<pre><code class="lang-typescript">{
+    windowPostMessageProxy: {
+        id: <span class="hljs-string">"ebixvvlbwa3tvtjra4i"</span>
+    },
+    key: <span class="hljs-string">"Value"</span>
+};
+</code></pre>
+				<p>If you want to customize how the tracking properties are added to and retreived from the message you can provide it at construction time as an object with two funtions. See the interface below:</p>
+				<pre><code class="lang-typescript"><span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> IProcessTrackingProperties {
+  addTrackingProperties&lt;T&gt;(message: T, trackingProperties: ITrackingProperties): T;
+  getTrackingProperties(message: <span class="hljs-built_in">any</span>): ITrackingProperties;
+}
+</code></pre>
+				<p><code>addTrackingProperties</code> takes a message adds the tracking properties object an returns the message.
+				<code>getTrackingProperties</code> takes a message and extracts the tracking properties.</p>
+				<p>Example:</p>
+				<pre><code class="lang-typescript"><span class="hljs-keyword">const</span> customProcessTrackingProperties = {
+    addTrackingProperties(message, trackingProperties) {
+        message.headers = {
+            <span class="hljs-string">'tracking-id'</span>: trackingProperties.id
+        };
+
+        <span class="hljs-keyword">return</span> message;
+    },
+    getTrackingProperties(message): ITrackingProperties {
+        <span class="hljs-keyword">return</span> {
+            id: message.headers[<span class="hljs-string">'tracking-id'</span>]
+        };
+    }
+};
+<span class="hljs-keyword">const</span> windowPostMessageProxy = <span class="hljs-keyword">new</span> WindowPostMessageProxy(customProcessTrackingProperties);
+</code></pre>
+				<h3 id="customizing-how-messages-are-detected-as-error-responses-">Customizing how messages are detected as error responses.</h3>
+				<p>By default response messages are considered error message if they contain an error property.</p>
+				<p>You can override this behavior by passing an <code>isErrorMessage</code> function at construction time. See interface:</p>
+				<pre><code class="lang-typescript"><span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> IIsErrorMessage {
+  (message: <span class="hljs-built_in">any</span>): <span class="hljs-built_in">boolean</span>;
+}
+</code></pre>
+				<p>Example:</p>
+				<pre><code class="lang-typescript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">isErrorMessage</span>(<span class="hljs-params">message: <span class="hljs-built_in">any</span></span>) </span>{
+    <span class="hljs-keyword">return</span> !(<span class="hljs-number">200</span> &lt;= message.status &amp;&amp; message.status &lt; <span class="hljs-number">300</span>);
+}
+
+<span class="hljs-keyword">const</span> windowPostMessageProxy = <span class="hljs-keyword">new</span> WindowPostMessageProxy({ isErrorMessage });
+</code></pre>
+				<h3 id="logging-messages">Logging messages</h3>
+				<p>By default messagse are not logged, but you can override this behavior by passing <code>logMessages: true</code> in the options object.</p>
+				<pre><code class="lang-typescript"><span class="hljs-keyword">const</span> windowPostMessageProxy = <span class="hljs-keyword">new</span> WindowPostMessageProxy({ logMessages: <span class="hljs-literal">true</span> });
+</code></pre>
+				<p>This will print out a stringified JSON of each object that is recieved or sent by the specific instance.</p>
+				<h3 id="supplying-custom-name">Supplying custom name</h3>
+				<p>Each windowPostMessageProxy gives itself a randomly generated name so you can see which instance is communicating in the log messages.
+				Oftem times you may want to pass a custom name which window the windowPostMessageProxy instance is running.</p>
+				<p>You can provided a name by passing <code>name: &#39;Iframe&#39;</code> in the options object.</p>
+				<pre><code class="lang-typescript"><span class="hljs-keyword">const</span> windowPostMessageProxy = <span class="hljs-keyword">new</span> WindowPostMessageProxy({ name: <span class="hljs-string">'Iframe'</span> });
+</code></pre>
+				<h3 id="supress-warning-message-about-unhandled-messages">Supress Warning Message about unhandled messages</h3>
+				<p>By default the window post message proxy will warn you if it received a message that was not handled since this is usually an indication of error; however,
+				if you are register multiple window message handlers the message may handled but it&#39;s just not able to be known by the windowPostMessageProxy and this warning no longer applies.</p>
+				<pre><code class="lang-typescript"><span class="hljs-keyword">const</span> windowPostMessageProxy = <span class="hljs-keyword">new</span> WindowPostMessageProxy({ suppressMessageNotHandledWarning: <span class="hljs-literal">true</span> });
+</code></pre>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_windowpostmessageproxy_.html">"window<wbr>Post<wbr>Message<wbr>Proxy"</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="http://typedoc.io" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>
