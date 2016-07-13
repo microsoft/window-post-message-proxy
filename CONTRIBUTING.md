@@ -14,8 +14,8 @@ npm install -g typescript gulp typings
 
 Install local dependencies:
 ```
-npm install
 typings install
+npm install
 ```
 
 ## Building
