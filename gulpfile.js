@@ -1,6 +1,8 @@
 var gulp = require('gulp-help')(require('gulp'));
 var del = require('del'),
+    ghPages = require('gulp-gh-pages'),
     header = require('gulp-header'),
+    moment = require('moment'),
     rename = require('gulp-rename'),
     replace = require('gulp-replace'),
     typedoc = require("gulp-typedoc"),
@@ -38,6 +40,13 @@ gulp.task('test', 'Run all tests', function (done) {
     );
 });
 
+gulp.task('ghpages', function () {
+    return gulp.src(['./docs/**/*'])
+        .pipe(ghPages({
+            force: true,
+            message: 'Update ' + moment().format('LLL')
+        }));
+});
 
 gulp.task("docs", function () {
     return gulp
