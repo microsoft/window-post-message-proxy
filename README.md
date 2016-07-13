@@ -8,12 +8,14 @@ The target window will also have an instance of the windowPostMessage proxy setu
 Then the original sending instance receives the response messag with id, it will look to see if there is matching id in cache and if so resolve the deferred object with the response.
 
 ## Installation
-```
+
+```bash
 npm install --save window-post-message-proxy
 ```
 
 ## Basic Usage
-```
+
+```typescript
 // Setup
 const iframe = document.getElementById("myFrame");
 const windowPostMessageProxy = new WindowPostMessageProxy();
@@ -36,7 +38,8 @@ windowPostMessageProxy.postMessage(iframe.conentWindow, message)
 By default the windowPostMessage proxy will store the tracking properties as object on the message by known property: `windowPostMesssageProxy`.
 
 This means if you call:
-```
+
+```typescript
 const message = {
     key: "Value"
 };
@@ -44,7 +47,8 @@ const message = {
 windowPostMessageProxy.postMessage(iframe.conentWindow, message);
 ```
 The message is actually modified before it's sent to become:
-```
+
+```typescript
 {
     windowPostMessageProxy: {
         id: "ebixvvlbwa3tvtjra4i"
@@ -53,8 +57,9 @@ The message is actually modified before it's sent to become:
 };
 ```
 
-If you want to customize how the tracking properties are added to and retreived from the message you can provide it at construction time as an object with two funtions. See the interface below: 
-```
+If you want to customize how the tracking properties are added to and retreived from the message you can provide it at construction time as an object with two funtions. See the interface below:
+
+```typescript
 export interface IProcessTrackingProperties {
   addTrackingProperties<T>(message: T, trackingProperties: ITrackingProperties): T;
   getTrackingProperties(message: any): ITrackingProperties;
@@ -65,7 +70,8 @@ export interface IProcessTrackingProperties {
 
 
 Example:
-```
+
+```typescript
 const customProcessTrackingProperties = {
     addTrackingProperties(message, trackingProperties) {
         message.headers = {
@@ -88,14 +94,16 @@ const windowPostMessageProxy = new WindowPostMessageProxy(customProcessTrackingP
 By default response messages are considered error message if they contain an error property.
 
 You can override this behavior by passing an `isErrorMessage` function at construction time. See interface:
-```
+
+```typescript
 export interface IIsErrorMessage {
   (message: any): boolean;
 }
 ```
 
 Example:
-```
+
+```typescript
 function isErrorMessage(message: any) {
     return !(200 <= message.status && message.status < 300);
 }
@@ -106,7 +114,8 @@ const windowPostMessageProxy = new WindowPostMessageProxy({ isErrorMessage });
 ### Logging messages
 
 By default messagse are not logged, but you can override this behavior by passing `logMessages: true` in the options object.
-```
+
+```typescript
 const windowPostMessageProxy = new WindowPostMessageProxy({ logMessages: true });
 ```
 This will print out a stringified JSON of each object that is recieved or sent by the specific instance.
@@ -117,7 +126,7 @@ Oftem times you may want to pass a custom name which window the windowPostMessag
 
 You can provided a name by passing `name: 'Iframe'` in the options object.
 
-```
+```typescript
 const windowPostMessageProxy = new WindowPostMessageProxy({ name: 'Iframe' });
 ```
 
@@ -125,6 +134,6 @@ const windowPostMessageProxy = new WindowPostMessageProxy({ name: 'Iframe' });
 By default the window post message proxy will warn you if it received a message that was not handled since this is usually an indication of error; however,
 if you are register multiple window message handlers the message may handled but it's just not able to be known by the windowPostMessageProxy and this warning no longer applies.
 
-```
+```typescript
 const windowPostMessageProxy = new WindowPostMessageProxy({ suppressMessageNotHandledWarning: true });
 ```
