@@ -630,7 +630,6 @@ describe('windowPostMessageProxy', function () {
           windowPostMessageProxy.postMessage(iframe.contentWindow, testData.message)
             .then((response: any) => {
               expect(response.warning).toBeDefined();
-              expect(response.originalMessage).toEqual(testData.message);
               done();
             });
         });
