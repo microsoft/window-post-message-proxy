@@ -243,8 +243,7 @@ export class WindowPostMessageProxy {
                   console.warn(`Proxy(${this.name}): ${warningMessage}`);
                 }
                 responseMessage = {
-                  warning: warningMessage,
-                  originalMessage: message
+                  warning: warningMessage
                 };
               }
               this.sendResponse(sendingWindow, responseMessage, trackingProperties);
