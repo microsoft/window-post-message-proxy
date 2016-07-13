@@ -3,6 +3,7 @@ var del = require('del'),
     header = require('gulp-header'),
     rename = require('gulp-rename'),
     replace = require('gulp-replace'),
+    typedoc = require("gulp-typedoc"),
     uglify = require('gulp-uglify'),
     karma = require('karma'),
     webpack = require('webpack'),
@@ -35,6 +36,26 @@ gulp.task('test', 'Run all tests', function (done) {
         'test:spec',
         done
     );
+});
+
+
+gulp.task("docs", function () {
+    return gulp
+        .src(["src/**/*.ts"])
+        .pipe(typedoc({
+            mode: 'modules',
+            includeDeclarations: true,
+
+            // Output options (see typedoc docs) 
+            out: "./docs",
+            json: "./docs.json",
+
+            // TypeDoc options (see typedoc docs) 
+            ignoreCompilerErrors: true,
+            version: true,
+            tsConfig: './tsconfig.json'
+        }))
+        ;
 });
 
 gulp.task('compile:ts', 'Compile source files', function () {
