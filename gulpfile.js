@@ -2,6 +2,7 @@ var gulp = require('gulp-help')(require('gulp'));
 var del = require('del'),
     ghPages = require('gulp-gh-pages'),
     header = require('gulp-header'),
+    fs = require('fs'),
     moment = require('moment'),
     rename = require('gulp-rename'),
     replace = require('gulp-replace'),
@@ -40,15 +41,17 @@ gulp.task('test', 'Run all tests', function (done) {
     );
 });
 
-gulp.task('ghpages', function () {
-    return gulp.src(['./docs/**/*'])
+gulp.task('ghpages', 'Deploy documentation to gh-pages', ['nojekyll'], function () {
+    return gulp.src(['./docs/**/*'], {
+        dot: true
+    })
         .pipe(ghPages({
             force: true,
             message: 'Update ' + moment().format('LLL')
         }));
 });
 
-gulp.task("docs", function () {
+gulp.task("docs", 'Compile documentation from src code', function () {
     return gulp
         .src(["src/**/*.ts"])
         .pipe(typedoc({
@@ -57,14 +60,23 @@ gulp.task("docs", function () {
 
             // Output options (see typedoc docs) 
             out: "./docs",
-            json: "./docs.json",
+            json: "./docs/json/" + package.name + ".json",
 
             // TypeDoc options (see typedoc docs) 
             ignoreCompilerErrors: true,
-            version: true,
-            tsConfig: './tsconfig.json'
+            version: true
         }))
         ;
+});
+
+gulp.task('nojekyll', 'Add .nojekyll file to docs directory', function (done) {
+    fs.writeFile('./docs/.nojekyll', '', function (error) {
+        if (error) {
+            throw error;
+        }
+
+        done();
+    });
 });
 
 gulp.task('compile:ts', 'Compile source files', function () {

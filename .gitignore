@@ -3,6 +3,5 @@ coverage
 typings
 dist
 docs
-docs.json
 tmp
 .publish
