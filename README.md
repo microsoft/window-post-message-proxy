@@ -1,5 +1,9 @@
 # window-post-message-proxy
-[![Build Status](https://travis-ci.com/Microsoft/window-post-message-proxy.svg?token=nXyWFYxRu6tVxUMJAuJr&branch=master)](https://travis-ci.com/Microsoft/window-post-message-proxy)
+[![Travis branch](https://img.shields.io/travis/Microsoft/window-post-message-proxy.svg)](https://travis-ci.org/Microsoft/window-post-message-proxy)
+[![npm](https://img.shields.io/npm/v/window-post-message-proxy.svg)](https://www.npmjs.com/package/window-post-message-proxy)
+[![Total Downloads](https://img.shields.io/npm/dt/window-post-message-proxy.svg)](https://www.npmjs.com/package/window-post-message-proxy)
+[![Monthly Downloads](https://img.shields.io/npm/dm/window-post-message-proxy.svg)](https://www.npmjs.com/package/window-post-message-proxy)
+[![GitHub tag](https://img.shields.io/github/tag/microsoft/window-post-message-proxy.svg)](https://github.com/Microsoft/window-post-message-proxy)
 
 A library used in place of the native window.postMessage which when used on both the sending and receiving windows allow for a nicer asynchronouse promise messaging between the windows.
 
