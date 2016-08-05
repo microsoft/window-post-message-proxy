@@ -5,7 +5,9 @@
   "main": "dist/windowPostMessageProxy.js",
   "typings": "dist/windowPostMessageProxy.d.ts",
   "scripts": {
-    "test": "gulp test --chrome",
+    "build": "gulp build",
+    "test": "gulp test",
+    "postinstall": "typings install",
     "prepublish": "gulp build"
   },
   "repository": {
@@ -52,6 +54,8 @@
     "run-sequence": "^1.1.5",
     "ts-loader": "^0.8.2",
     "typedoc": "^0.4.4",
+    "typescript": "^1.8.10",
+    "typings": "^1.3.2",
     "webpack-stream": "^3.2.0",
     "yargs": "^4.6.0"
   },
