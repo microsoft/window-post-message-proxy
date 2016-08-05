@@ -12,7 +12,7 @@ The target window will also have an instance of the windowPostMessage proxy setu
 Then the original sending instance receives the response messag with id, it will look to see if there is matching id in cache and if so resolve the deferred object with the response.
 
 ## Documentation
-### (https://microsoft.github.io/window-post-message-proxy)[https://microsoft.github.io/window-post-message-proxy]
+### [https://microsoft.github.io/window-post-message-proxy](https://microsoft.github.io/window-post-message-proxy)
 
 ## Installation
 
