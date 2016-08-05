@@ -11,6 +11,9 @@ When sending messages using the proxy, it will apply a unique id to the message,
 The target window will also have an instance of the windowPostMessage proxy setup which will send back messages and preserve the unique id.
 Then the original sending instance receives the response messag with id, it will look to see if there is matching id in cache and if so resolve the deferred object with the response.
 
+## Documentation
+### (https://microsoft.github.io/window-post-message-proxy)[https://microsoft.github.io/window-post-message-proxy]
+
 ## Installation
 
 ```bash
