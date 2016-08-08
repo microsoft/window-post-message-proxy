@@ -1,3 +1,12 @@
 language: node_js
 node_js:
-    - node
+- node
+deploy:
+  provider: npm
+  email: nugetpowerbi@microsoft.com
+  api_key:
+    secure: i0OEAxLEaCcO+8PPZYmRO0M2Wiilrcc8yJTZrlxNFDJJSJatZ6CiWJ2FYP/MQ4I+buLZJpycaFNq3HmKy/BXPgjitFgiWfWBVBYjUsJ1XHMazIVKUeYyh8Jiy5cs+KIPBXIF8HJL34DtQxySTVRHfiLsR/sAO2lUraFyqEL+N8cydGXt2rRlXW2Cxn1qB2+cbz+nFqqnm6kax+1HXNCs1fCiZXCAtVbVE3LOcwlBx+h3IS4jHnsmrrRyhk26RFYzO4+eogIBylAa7t1gIi6FWJAe6tr+JaZblNzCPeGqtyrn/xqq1znVeXVbuGeUDR6Vs5myDRGpCLNFP10ID3Qjvmof/mwK5Hh6AR70eDvIzp2EI/3Xw1BijhIASV69j89c2EOyg3fHTVTehaJgxs1LYuMpr/FVZ8MMYC8hnVVHeRUNUQNhAaWb9hQcF4IMebbpkpdTUX6deyzZLCC+sx3iGUuSqJPB2qdQMUoXgZrjmkEphEa8jURsCgTrj30HE2xyFZ/8uGsXY7GOmJWkIY2FMeNhWx1+MvuJsNr48LdF2q+0yqe5+X2yp26BmWTa2SiHNIVjoUpJc/5qUvNRL0miujxfPggM26ZBXrwiAf9l38C96KXjJTpPxZs4RMf+EpgpnFqHqPkpLX3c9dkbV1d6zwLRHP5aiG5ciX6Mmm/YGGU=
+  on:
+    tags: true
+    repo: Microsoft/window-post-message-proxy
+    branch: dev
