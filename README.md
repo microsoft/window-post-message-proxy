@@ -1,11 +1,11 @@
 # window-post-message-proxy
 [![Build Status](https://travis-ci.com/Microsoft/window-post-message-proxy.svg?token=nXyWFYxRu6tVxUMJAuJr&branch=master)](https://travis-ci.com/Microsoft/window-post-message-proxy)
 
-A library used in place of the native window.postMessage which when used on both the sending and receiving windows allow for a nicer asynchronouse promise messaging between the windows.
+A library used in place of the native window.postMessage which when used on both the sending and receiving windows allow for a nicer asynchronous promise messaging between the windows.
 
 When sending messages using the proxy, it will apply a unique id to the message, create a deferred object referenced by the id, and pass the message on to the target window.
 The target window will also have an instance of the windowPostMessage proxy setup which will send back messages and preserve the unique id.
-Then the original sending instance receives the response messag with id, it will look to see if there is matching id in cache and if so resolve the deferred object with the response.
+Then the original sending instance receives the response message with id, it will look to see if there is matching id in cache and if so resolve the deferred object with the response.
 
 ## Installation
 
@@ -57,7 +57,7 @@ The message is actually modified before it's sent to become:
 };
 ```
 
-If you want to customize how the tracking properties are added to and retreived from the message you can provide it at construction time as an object with two funtions. See the interface below:
+If you want to customize how the tracking properties are added to and retrieved from the message you can provide it at construction time as an object with two functions. See the interface below:
 
 ```typescript
 export interface IProcessTrackingProperties {
@@ -65,7 +65,7 @@ export interface IProcessTrackingProperties {
   getTrackingProperties(message: any): ITrackingProperties;
 }
 ```
-`addTrackingProperties` takes a message adds the tracking properties object an returns the message.
+`addTrackingProperties` takes a message and adds the tracking properties object and returns the message.
 `getTrackingProperties` takes a message and extracts the tracking properties.
 
 
@@ -113,16 +113,16 @@ const windowPostMessageProxy = new WindowPostMessageProxy({ isErrorMessage });
 
 ### Logging messages
 
-By default messagse are not logged, but you can override this behavior by passing `logMessages: true` in the options object.
+By default messages are not logged, but you can override this behavior by passing `logMessages: true` in the options object.
 
 ```typescript
 const windowPostMessageProxy = new WindowPostMessageProxy({ logMessages: true });
 ```
-This will print out a stringified JSON of each object that is recieved or sent by the specific instance.
+This will print out a stringified JSON of each object that is received or sent by the specific instance.
 
 ### Supplying custom name
 Each windowPostMessageProxy gives itself a randomly generated name so you can see which instance is communicating in the log messages.
-Oftem times you may want to pass a custom name which window the windowPostMessageProxy instance is running.
+Often times you may want to pass a custom name for which window the windowPostMessageProxy instance is running.
 
 You can provided a name by passing `name: 'Iframe'` in the options object.
 
