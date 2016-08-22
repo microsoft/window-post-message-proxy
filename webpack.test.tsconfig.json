@@ -1,14 +1,14 @@
 {
-    "compilerOptions": {
-        "target": "es5",
-        "noImplicitAny": true,
-        "sourceMap": true
-    },
-    "exclude": [
-        "node_modules",
-        "typings/index.d.ts",
-        "dist",
-        "test",
-        "tmp"
-    ]
+  "compilerOptions": {
+    "target": "es5",
+    "noImplicitAny": true,
+    "sourceMap": true
+  },
+  "exclude": [
+    "node_modules",
+    "typings/index.d.ts",
+    "dist",
+    "test",
+    "tmp"
+  ]
 }

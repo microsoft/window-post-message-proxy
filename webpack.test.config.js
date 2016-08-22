@@ -1,4 +1,4 @@
-module.exports = {  
+module.exports = {
   entry: './test/windowPostMessageProxy.spec.ts',
   output: {
     path: __dirname + "/tmp",
