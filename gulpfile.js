@@ -6,6 +6,7 @@ var del = require('del'),
     moment = require('moment'),
     rename = require('gulp-rename'),
     replace = require('gulp-replace'),
+    tslint = require('gulp-tslint'),
     typedoc = require("gulp-typedoc"),
     uglify = require('gulp-uglify'),
     karma = require('karma'),
@@ -23,6 +24,7 @@ var gulpBanner = "/*! " + webpackBanner + " */\n";
 
 gulp.task('build', 'Build for release', function (done) {
     return runSequence(
+        'tslint:build',
         'clean:dist',
         'compile:ts',
         'min',
@@ -34,6 +36,7 @@ gulp.task('build', 'Build for release', function (done) {
 
 gulp.task('test', 'Run all tests', function (done) {
     return runSequence(
+        'tslint:test',
         'clean:tmp',
         'compile:spec',
         'test:spec',
@@ -139,4 +142,20 @@ gulp.task('test:spec', 'Runs spec tests', function (done) {
         singleRun: argv.watch ? false : true,
         captureTimeout: argv.timeout || 20000
     }, done);
+});
+
+gulp.task('tslint:build', 'Run TSLint on src', function () {
+  return gulp.src(["src/**/*.ts"])
+    .pipe(tslint({
+      formatter: "verbose"
+    }))
+    .pipe(tslint.report());
+});
+
+gulp.task('tslint:test', 'Run TSLint on src and tests', function () {
+  return gulp.src(["src/**/*.ts", "test/**/*.ts"])
+    .pipe(tslint({
+      formatter: "verbose"
+    }))
+    .pipe(tslint.report());
 });

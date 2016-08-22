@@ -1,11 +1,11 @@
 interface IDeferred {
-  resolve: <T>(value?: T | Promise<T>) => void,
-  reject: <T>(error: T) => void,
-  promise: Promise<any>
+  resolve: <T>(value?: T | Promise<T>) => void;
+  reject: <T>(error: T) => void;
+  promise: Promise<any>;
 }
 
 interface IDeferredCache {
-  [messageId: string]: IDeferred
+  [messageId: string]: IDeferred;
 }
 
 export interface ITrackingProperties {
@@ -40,7 +40,7 @@ export interface IWindowPostMessageProxyOptions {
   isErrorMessage?: IIsErrorMessage;
   name?: string;
   logMessages?: boolean;
-  eventSourceOverrideWindow?: Window,
+  eventSourceOverrideWindow?: Window;
   suppressWarnings?: boolean;
 }
 
@@ -59,6 +59,34 @@ export class WindowPostMessageProxy {
   }
 
   private static messagePropertyName = "windowPostMessageProxy";
+  /**
+   * Utility to create a deferred object.
+   */
+  // TODO: Look to use RSVP library instead of doing this manually.
+  // From what I searched RSVP would work better because it has .finally and .deferred; however, it doesn't have Typings information. 
+  private static createDeferred(): IDeferred {
+    const deferred: IDeferred = {
+      resolve: null,
+      reject: null,
+      promise: null
+    };
+
+    const promise = new Promise((resolve: () => void, reject: () => void) => {
+      deferred.resolve = resolve;
+      deferred.reject = reject;
+    });
+
+    deferred.promise = promise;
+
+    return deferred;
+  }
+
+  /**
+   * Utility to generate random sequence of characters used as tracking id for promises.
+   */
+  private static createRandomString(): string {
+    return (Math.random() + 1).toString(36).substring(7);
+  }
 
   // Private
   private logMessages: boolean;
@@ -117,7 +145,7 @@ export class WindowPostMessageProxy {
    */
   removeHandler(handler: IMessageHandler) {
     const handlerIndex = this.handlers.indexOf(handler);
-    if (handlerIndex == -1) {
+    if (handlerIndex === -1) {
       throw new Error(`You attempted to remove a handler but no matching handler was found.`);
     }
 
@@ -271,7 +299,7 @@ export class WindowPostMessageProxy {
        */
       let isErrorMessage = true;
       try {
-        isErrorMessage = this.isErrorMessage(message)
+        isErrorMessage = this.isErrorMessage(message);
       }
       catch (e) {
         console.warn(`Proxy(${this.name}) Error occurred when trying to determine if message is consider an error response. Message: `, JSON.stringify(message, null, ''), 'Error: ', e);
@@ -287,34 +315,5 @@ export class WindowPostMessageProxy {
       // TODO: Move to .finally clause up where promise is created for better maitenance like original proxy code.
       delete this.pendingRequestPromises[trackingProperties.id];
     }
-  }
-
-  /**
-   * Utility to create a deferred object.
-   */
-  // TODO: Look to use RSVP library instead of doing this manually.
-  // From what I searched RSVP would work better because it has .finally and .deferred; however, it doesn't have Typings information. 
-  private static createDeferred(): IDeferred {
-    const deferred: IDeferred = {
-      resolve: null,
-      reject: null,
-      promise: null
-    };
-
-    const promise = new Promise((resolve: () => void, reject: () => void) => {
-      deferred.resolve = resolve;
-      deferred.reject = reject;
-    });
-
-    deferred.promise = promise;
-
-    return deferred;
-  }
-
-  /**
-   * Utility to generate random sequence of characters used as tracking id for promises.
-   */
-  private static createRandomString(): string {
-    return (Math.random() + 1).toString(36).substring(7);
   }
 }

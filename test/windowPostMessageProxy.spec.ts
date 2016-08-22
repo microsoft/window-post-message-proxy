@@ -1,6 +1,8 @@
 import * as wpmp from '../src/windowPostMessageProxy';
 
+/* tslint:disable-next-line:no-namespace */
 declare global {
+  /* tslint:disable-next-line:interface-name */
   interface Window {
     __karma__: any;
   }
@@ -160,7 +162,7 @@ describe('windowPostMessageProxy', function () {
       };
 
       const unusedHandler: wpmp.IMessageHandler = {
-        test() { return true },
+        test() { return true; },
         handle: jasmine.createSpy("unusedHandlerSpy")
       };
 
@@ -179,7 +181,7 @@ describe('windowPostMessageProxy', function () {
         });
 
       // Assert
-    })
+    });
 
     it("consumers can override how tracking id is added and retrieved from the message by passing in object at construction time.", function (done) {
       // Setup
@@ -313,7 +315,7 @@ describe('windowPostMessageProxy', function () {
 
     beforeAll(function () {
       warnSpy = spyOn(console, "warn");
-      
+
       const iframeSrc = "base/test/utility/noop.html";
       const $iframe = $(`<iframe src="${iframeSrc}"></iframe>`).appendTo(document.body);
       iframe = <HTMLIFrameElement>$iframe.get(0);
@@ -324,7 +326,7 @@ describe('windowPostMessageProxy', function () {
         isErrorMessage: badIsErrorMessageSpy,
         processTrackingProperties: {
           addTrackingProperties: (message: any, trackingProperties: wpmp.ITrackingProperties) => {
-            if(typeof message !== "object") {
+            if (typeof message !== "object") {
               return;
             }
 
@@ -422,13 +424,13 @@ describe('windowPostMessageProxy', function () {
       iframeLoaded
         .then(() => {
           badGetTrackingPropertiesSpy.and.callFake(badGetTrackingProperties);
-          windowPostMessageProxy.postMessage(iframe.contentWindow, testData.message)
+          windowPostMessageProxy.postMessage(iframe.contentWindow, testData.message);
 
           setTimeout(() => {
-              // Assert
-              expect(badGetTrackingPropertiesSpy).toHaveBeenCalled();
-              expect(warnSpy).toHaveBeenCalled();
-              done();
+            // Assert
+            expect(badGetTrackingPropertiesSpy).toHaveBeenCalled();
+            expect(warnSpy).toHaveBeenCalled();
+            done();
           }, 100);
         });
     });
@@ -449,13 +451,13 @@ describe('windowPostMessageProxy', function () {
       iframeLoaded
         .then(() => {
           badAddTrackingPropertiesSpy.and.callFake(badAddTrackingProperties);
-          windowPostMessageProxy.postMessage(iframe.contentWindow, testData.message)
+          windowPostMessageProxy.postMessage(iframe.contentWindow, testData.message);
 
           setTimeout(() => {
-              // Assert
-              expect(badAddTrackingPropertiesSpy).toHaveBeenCalled();
-              expect(warnSpy).toHaveBeenCalled();
-              done();
+            // Assert
+            expect(badAddTrackingPropertiesSpy).toHaveBeenCalled();
+            expect(warnSpy).toHaveBeenCalled();
+            done();
           }, 100);
         });
     });
@@ -477,7 +479,7 @@ describe('windowPostMessageProxy', function () {
     let badIsErrorMessageSpy = jasmine.createSpy("isErrorMessageSpy").and.callFake(badIsErrorMessage);
 
     beforeAll(function () {
-      
+
       const iframeSrc = "base/test/utility/noop.html";
       const $iframe = $(`<iframe src="${iframeSrc}"></iframe>`).appendTo(document.body);
       iframe = <HTMLIFrameElement>$iframe.get(0);
@@ -542,12 +544,12 @@ describe('windowPostMessageProxy', function () {
       // Act
       iframeLoaded
         .then(() => {
-          windowPostMessageProxy.postMessage(iframe.contentWindow, testData.message)
+          windowPostMessageProxy.postMessage(iframe.contentWindow, testData.message);
 
           setTimeout(() => {
-              // Assert
-              expect(badIsErrorMessageSpy).toHaveBeenCalled();
-              done();
+            // Assert
+            expect(badIsErrorMessageSpy).toHaveBeenCalled();
+            done();
           }, 100);
         });
     });
@@ -565,7 +567,7 @@ describe('windowPostMessageProxy', function () {
     let iframeLoaded: Promise<void>;
 
     beforeAll(function () {
-      
+
       const iframeSrc = "base/test/utility/noop.html";
       const $iframe = $(`<iframe src="${iframeSrc}"></iframe>`).appendTo(document.body);
       iframe = <HTMLIFrameElement>$iframe.get(0);
