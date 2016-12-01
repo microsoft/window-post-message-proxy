@@ -32,7 +32,7 @@ const message = {
     key: "Value"
 };
 
-windowPostMessageProxy.postMessage(iframe.conentWindow, message)
+windowPostMessageProxy.postMessage(iframe.contentWindow, message)
     .then(response => {
         
     });
