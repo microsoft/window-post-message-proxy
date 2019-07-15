@@ -32,7 +32,7 @@ const message = {
     key: "Value"
 };
 
-windowPostMessageProxy.postMessage(iframe.conentWindow, message)
+windowPostMessageProxy.postMessage(iframe.contentWindow, message)
     .then(response => {
         
     });
@@ -51,7 +51,7 @@ const message = {
     key: "Value"
 };
 
-windowPostMessageProxy.postMessage(iframe.conentWindow, message);
+windowPostMessageProxy.postMessage(iframe.contentWindow, message);
 ```
 The message is actually modified before it's sent to become:
 
