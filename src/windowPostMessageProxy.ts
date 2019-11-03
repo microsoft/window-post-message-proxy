@@ -1,3 +1,9 @@
+declare global {
+  interface Window {
+    msCrypto: Crypto;
+  }
+}
+
 interface IDeferred {
   resolve: <T>(value?: T | Promise<T>) => void;
   reject: <T>(error: T) => void;
@@ -85,7 +91,13 @@ export class WindowPostMessageProxy {
    * Utility to generate random sequence of characters used as tracking id for promises.
    */
   private static createRandomString(): string {
-    return (Math.random() + 1).toString(36).substring(7);
+
+    	// window.msCrypto for IE
+      var cryptoObj = window.crypto || window.msCrypto;
+      var randomValueArray = new Uint32Array(1);
+      cryptoObj.getRandomValues(randomValueArray);
+
+      return randomValueArray[0].toString(36).substring(1);
   }
 
   // Private
