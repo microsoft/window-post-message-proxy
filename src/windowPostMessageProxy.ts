@@ -93,8 +93,8 @@ export class WindowPostMessageProxy {
   private static createRandomString(): string {
 
     	// window.msCrypto for IE
-      var cryptoObj = window.crypto || window.msCrypto;
-      var randomValueArray = new Uint32Array(1);
+      let cryptoObj = window.crypto || window.msCrypto;
+      let randomValueArray = new Uint32Array(1);
       cryptoObj.getRandomValues(randomValueArray);
 
       return randomValueArray[0].toString(36).substring(1);
