@@ -1,5 +1,4 @@
 # window-post-message-proxy
-[![Travis branch](https://img.shields.io/travis/Microsoft/window-post-message-proxy.svg)](https://travis-ci.org/Microsoft/window-post-message-proxy)
 [![npm](https://img.shields.io/npm/v/window-post-message-proxy.svg)](https://www.npmjs.com/package/window-post-message-proxy)
 [![Total Downloads](https://img.shields.io/npm/dt/window-post-message-proxy.svg)](https://www.npmjs.com/package/window-post-message-proxy)
 [![Monthly Downloads](https://img.shields.io/npm/dm/window-post-message-proxy.svg)](https://www.npmjs.com/package/window-post-message-proxy)
