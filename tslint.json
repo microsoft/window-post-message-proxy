@@ -1,9 +1,11 @@
 {
   "extends": "tslint:recommended",
   "rules": {
+    "interface-name" : false,
     "max-line-length": false,
     "member-access": false,
     "no-console": false,
+    "no-namespace": false,
     "one-line": [
       "check-whitespace",
       "check-open-brace"
