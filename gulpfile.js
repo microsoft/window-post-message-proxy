@@ -1,7 +1,8 @@
-var gulp = require('gulp-help')(require('gulp'));
+var gulp = require('gulp');
 var del = require('del'),
   ghPages = require('gulp-gh-pages'),
   header = require('gulp-header'),
+  help = require('gulp-help-four'),
   fs = require('fs'),
   moment = require('moment'),
   rename = require('gulp-rename'),
@@ -14,9 +15,11 @@ var del = require('del'),
   webpackStream = require('webpack-stream'),
   webpackConfig = require('./webpack.config'),
   webpackTestConfig = require('./webpack.test.config'),
-  runSequence = require('run-sequence'),
+  runSequence = require('gulp4-run-sequence'),
   argv = require('yargs').argv
   ;
+
+help(gulp, undefined);
 
 var package = require('./package.json');
 var webpackBanner = package.name + " v" + package.version + " | (c) 2016 Microsoft Corporation " + package.license;
