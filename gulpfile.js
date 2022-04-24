@@ -16,7 +16,8 @@ var del = require('del'),
   webpackConfig = require('./webpack.config'),
   webpackTestConfig = require('./webpack.test.config'),
   runSequence = require('gulp4-run-sequence'),
-  argv = require('yargs').argv
+  argv = require('yargs').argv,
+  saveLicense = require('uglify-save-license')
   ;
 
 help(gulp, undefined);
@@ -104,7 +105,9 @@ gulp.task('header', 'Add header to distributed files', function () {
 gulp.task('min', 'Minify build files', function () {
   return gulp.src(['./dist/*.js'])
     .pipe(uglify({
-      preserveComments: 'license'
+      output: {
+          comments: saveLicense
+      }
     }))
     .pipe(rename({
       suffix: '.min'
@@ -140,11 +143,13 @@ gulp.task('generatecustomdts', 'Generate dts with no exports', function (done) {
 });
 
 gulp.task('test:spec', 'Runs spec tests', function (done) {
-  new karma.Server.start({
+  new karma.Server({
     configFile: __dirname + '/karma.conf.js',
     singleRun: argv.watch ? false : true,
     captureTimeout: argv.timeout || 20000
-  }, done);
+  }, function () {
+    done();
+  }).start();
 });
 
 gulp.task('tslint:build', 'Run TSLint on src', function () {

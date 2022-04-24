@@ -77,7 +77,7 @@ export class WindowPostMessageProxy {
       promise: null
     };
 
-    const promise = new Promise((resolve: () => void, reject: () => void) => {
+    const promise = new Promise((resolve: (value: any) => void, reject: () => void) => {
       deferred.resolve = resolve;
       deferred.reject = reject;
     });
@@ -223,7 +223,7 @@ export class WindowPostMessageProxy {
       console.log(JSON.stringify(event.data, null, '  '));
     }
 
-    let sendingWindow = this.eventSourceOverrideWindow || event.source;
+    let sendingWindow = this.eventSourceOverrideWindow || event.source as Window;
     let message: any = event.data;
 
     if (typeof message !== "object") {
