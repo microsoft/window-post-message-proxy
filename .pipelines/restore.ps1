@@ -21,6 +21,11 @@ Write-Host "start: npm install"
 & npm install --no-audit --no-save
 Write-Host "done: npm install"
 
+Write-Host "start: npm install gulp and gulp-gh-pages"
+& npm install -g gulp gulp-gh-pages
+& npm link gulp gulp-gh-pages --no-bin-links
+Write-Host "done: npm install gulp and gulp-gh-pages"
+
 $exitCode += $LASTEXITCODE;
 
 exit $exitCode

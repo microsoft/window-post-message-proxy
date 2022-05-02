@@ -14,6 +14,12 @@ Install local dependencies:
 npm install
 ```
 
+Install gulp and gulp-gh-pages globally and create a local link to it:
+```
+npm install -g gulp gulp-gh-pages
+npm link gulp gulp-gh-pages --no-bin-links
+```
+
 ## Building
 ```
 npm run build
