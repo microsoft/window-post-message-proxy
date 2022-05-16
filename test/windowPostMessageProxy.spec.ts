@@ -16,8 +16,8 @@ describe('windowPostMessageProxy', function () {
     let iframeWindowPostMessageProxy: wpmp.WindowPostMessageProxy;
     let handler: wpmp.IMessageHandler;
     let spyHandler: {
-      test: jasmine.Spy,
-      handle: jasmine.Spy
+      test: jasmine.Spy;
+      handle: jasmine.Spy;
     };
     let iframe: HTMLIFrameElement;
     let iframe2: HTMLIFrameElement;
@@ -174,7 +174,7 @@ describe('windowPostMessageProxy', function () {
       iframeLoaded
         .then(() => {
           windowPostMessageProxy.postMessage(iframe.contentWindow, testData.message)
-            .then((message: any) => {
+            .then((message: any) => { /* eslint-disable-line */
               expect(unusedHandlerSpy).not.toHaveBeenCalled();
               done();
             });
@@ -294,20 +294,20 @@ describe('windowPostMessageProxy', function () {
     let iframeWindowPostMessageProxy: wpmp.WindowPostMessageProxy;
     let handler: wpmp.IMessageHandler;
     let spyHandler: {
-      test: jasmine.Spy,
-      handle: jasmine.Spy
+      test: jasmine.Spy;
+      handle: jasmine.Spy;
     };
     let iframe: HTMLIFrameElement;
     let iframeLoaded: Promise<void>;
-    let badAddTrackingProperties: wpmp.IAddTrackingProperties = (message: any, trackingProperties: wpmp.ITrackingProperties) => {
+    let badAddTrackingProperties: wpmp.IAddTrackingProperties = (message: any, trackingProperties: wpmp.ITrackingProperties) => { /* eslint-disable-line */
       throw new Error(`Forced error thrown by bad addTrackingProperties method`);
     };
     let badAddTrackingPropertiesSpy = jasmine.createSpy("addTrackingPropertiesSpy").and.callFake(badAddTrackingProperties);
-    let badGetTrackingProperties: wpmp.IGetTrackingProperties = (message: any): wpmp.ITrackingProperties => {
+    let badGetTrackingProperties: wpmp.IGetTrackingProperties = (message: any): wpmp.ITrackingProperties => { /* eslint-disable-line */
       throw new Error(`Forced error thrown by bad getTrackingProperties method`);
     };
     let badGetTrackingPropertiesSpy = jasmine.createSpy("getTrackingPropertiesSpy").and.callFake(badGetTrackingProperties);
-    let badIsErrorMessage: wpmp.IIsErrorMessage = (message: any): boolean => {
+    let badIsErrorMessage: wpmp.IIsErrorMessage = (message: any): boolean => { /* eslint-disable-line */
       throw new Error(`Forced error thrown by bad isErrorMessage method`);
     };
     let badIsErrorMessageSpy = jasmine.createSpy("isErrorMessageSpy").and.callFake(badIsErrorMessage);
@@ -468,12 +468,12 @@ describe('windowPostMessageProxy', function () {
     let iframeWindowPostMessageProxy: wpmp.WindowPostMessageProxy;
     let handler: wpmp.IMessageHandler;
     let spyHandler: {
-      test: jasmine.Spy,
-      handle: jasmine.Spy
+      test: jasmine.Spy;
+      handle: jasmine.Spy;
     };
     let iframe: HTMLIFrameElement;
     let iframeLoaded: Promise<void>;
-    let badIsErrorMessage: wpmp.IIsErrorMessage = (message: any): boolean => {
+    let badIsErrorMessage: wpmp.IIsErrorMessage = (message: any): boolean => { /* eslint-disable-line */
       throw new Error(`Forced error thrown by bad isErrorMessage method`);
     };
     let badIsErrorMessageSpy = jasmine.createSpy("isErrorMessageSpy").and.callFake(badIsErrorMessage);
@@ -560,8 +560,8 @@ describe('windowPostMessageProxy', function () {
     let iframeWindowPostMessageProxy: wpmp.WindowPostMessageProxy;
     let handler: wpmp.IMessageHandler;
     let spyHandler: {
-      test: jasmine.Spy,
-      handle: jasmine.Spy
+      test: jasmine.Spy;
+      handle: jasmine.Spy;
     };
     let iframe: HTMLIFrameElement;
     let iframeLoaded: Promise<void>;
@@ -585,7 +585,7 @@ describe('windowPostMessageProxy', function () {
 
       handler = {
         test: jasmine.createSpy("testSpy").and.returnValue(true),
-        handle: jasmine.createSpy("handleSpy").and.callFake(function (message: any) {
+        handle: jasmine.createSpy("handleSpy").and.callFake(function (message: any) { /* eslint-disable-line */
           console.log('Spy handler called');
         })
       };

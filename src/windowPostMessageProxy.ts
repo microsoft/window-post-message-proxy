@@ -69,7 +69,7 @@ export class WindowPostMessageProxy {
    * Utility to create a deferred object.
    */
   // TODO: Look to use RSVP library instead of doing this manually.
-  // From what I searched RSVP would work better because it has .finally and .deferred; however, it doesn't have Typings information. 
+  // From what I searched RSVP would work better because it has .finally and .deferred; however, it doesn't have Typings information.
   private static createDeferred(): IDeferred {
     const deferred: IDeferred = {
       resolve: null,
@@ -93,11 +93,11 @@ export class WindowPostMessageProxy {
   private static createRandomString(): string {
 
     	// window.msCrypto for IE
-      let cryptoObj = window.crypto || window.msCrypto;
-      let randomValueArray = new Uint32Array(1);
-      cryptoObj.getRandomValues(randomValueArray);
+    let cryptoObj = window.crypto || window.msCrypto;
+    let randomValueArray = new Uint32Array(1);
+    cryptoObj.getRandomValues(randomValueArray);
 
-      return randomValueArray[0].toString(36).substring(1);
+    return randomValueArray[0].toString(36).substring(1);
   }
 
   // Private
@@ -146,7 +146,7 @@ export class WindowPostMessageProxy {
 
   /**
    * Adds handler.
-   * If the first handler whose test method returns true will handle the message and provide a response. 
+   * If the first handler whose test method returns true will handle the message and provide a response.
    */
   addHandler(handler: IMessageHandler) {
     this.handlers.push(handler);
