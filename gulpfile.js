@@ -58,24 +58,6 @@ gulp.task('ghpages', 'Deploy documentation to gh-pages', ['nojekyll'], function 
     }));
 });
 
-gulp.task("docs", 'Compile documentation from src code', function () {
-  return gulp
-    .src(["typings/globals/es6-promise/index.d.ts", "src/**/*.ts"])
-    .pipe(typedoc({
-      mode: 'modules',
-      includeDeclarations: true,
-
-      // Output options (see typedoc docs) 
-      out: "./docs",
-      json: "./docs/json/" + package.name + ".json",
-
-      // TypeDoc options (see typedoc docs) 
-      ignoreCompilerErrors: true,
-      version: true
-    }))
-    ;
-});
-
 gulp.task('nojekyll', 'Add .nojekyll file to docs directory', function (done) {
   fs.writeFile('./docs/.nojekyll', '', function (error) {
     if (error) {
@@ -91,7 +73,7 @@ gulp.task('compile:ts', 'Compile source files', function () {
     new webpack.BannerPlugin(webpackBanner)
   ];
 
-  return gulp.src(['typings/**/*.d.ts', './src/**/*.ts'])
+  return gulp.src(['./src/**/*.ts'])
     .pipe(webpackStream(webpackConfig))
     .pipe(gulp.dest('./dist'));
 });
