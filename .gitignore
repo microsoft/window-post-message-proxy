@@ -6,4 +6,3 @@ docs
 tmp
 .publish
 npm-debug.log*
-package-lock.json

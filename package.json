@@ -5,7 +5,6 @@
   "main": "dist/windowPostMessageProxy.js",
   "types": "dist/windowPostMessageProxy.d.ts",
   "scripts": {
-    "preinstall": "npm install --package-lock-only --ignore-scripts && npx npm-force-resolutions",
     "build": "gulp build",
     "test": "gulp test",
     "gulp": "gulp"
@@ -13,12 +12,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Microsoft/window-post-message-proxy"
-  },
-  "resolutions": {
-    "glob-parent": "^6.0.2",
-    "lodash.template": "^4.5.0",
-    "micromatch": "^4.0.5",
-    "braces": "^3.0.2"
   },
   "files": [
     "dist"
@@ -78,6 +71,11 @@
     "webpack": "^5.71.0",
     "webpack-stream": "^7.0.0",
     "yargs": "^17.4.1"
+  },
+  "overrides": {
+    "glob-parent": "^6.0.2",
+    "lodash.template": "^4.5.0",
+    "micromatch": "^4.0.5"
   },
   "publishConfig": {
     "tag": "beta"
