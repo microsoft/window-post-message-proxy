@@ -13,13 +13,17 @@ module.exports = function (config) {
     exclude: [],
     reporters: argv.debug ? ['spec'] : ['spec', 'coverage'],
     autoWatch: true,
-    browsers: [argv.chrome ? 'Chrome' : 'PhantomJS'],
+    browsers: ["Chrome_headless"],
+    customLaunchers: {
+			'Chrome_headless': {
+				base: 'Chrome',
+			},
+		},
     plugins: [
       'karma-chrome-launcher',
       'karma-jasmine',
       'karma-spec-reporter',
       'karma-sourcemap-loader',
-      'karma-phantomjs-launcher',
       'karma-coverage'
     ],
     preprocessors: {
