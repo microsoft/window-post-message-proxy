@@ -224,6 +224,10 @@ export class WindowPostMessageProxy {
     }
 
     let sendingWindow = this.eventSourceOverrideWindow || event.source as Window;
+    if (!sendingWindow) {
+      return;
+    }
+
     let message: any = event.data;
 
     if (typeof message !== "object") {
