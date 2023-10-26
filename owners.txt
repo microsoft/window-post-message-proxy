@@ -1,0 +1,12 @@
+#############################################################
+# This is an Ownership Enforcer owners.txt file.
+# You can add comments using ; or # as prefix.
+# Only one alias per line is accepted.
+# Information on Ownership Enforcer can be found at https://aka.ms/ownershipenforcer
+#############################################################
+
+# As a OneCompliance (Trusted Platform) requirement, all repositories must enable Ownership Enforcer
+# Please provide your own security groups (SGs) or aliases to this file
+# We encourage teams to utilize ADO teams rather than list individual aliases in the Owners.txt file
+# Temporary msbiesg as been added to resolve the OneCompliance audit issue.
+msbiesg
