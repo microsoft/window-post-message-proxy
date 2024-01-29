@@ -191,7 +191,7 @@ export class WindowPostMessageProxy {
       console.log(JSON.stringify(message, null, '  '));
     }
 
-    targetWindow.postMessage(message, "*");
+    targetWindow?.postMessage(message, "*");
     const deferred = WindowPostMessageProxy.createDeferred();
     this.pendingRequestPromises[trackingProperties.id] = deferred;
 
@@ -210,7 +210,7 @@ export class WindowPostMessageProxy {
       console.log(JSON.stringify(message, null, '  '));
     }
 
-    targetWindow.postMessage(message, "*");
+    targetWindow?.postMessage(message, "*");
   }
 
   /**
