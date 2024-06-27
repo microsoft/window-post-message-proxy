@@ -1,14 +1,11 @@
 var gulp = require('gulp');
 var del = require('del'),
-  ghPages = require('gulp-gh-pages'),
-  header = require('gulp-header'),
+prepend = require('gulp-prepend'),
   help = require('gulp-help-four'),
   fs = require('fs'),
-  moment = require('moment'),
   rename = require('gulp-rename'),
   replace = require('gulp-replace'),
   eslint = require('gulp-eslint'),
-  typedoc = require("gulp-typedoc"),
   uglify = require('gulp-uglify'),
   karma = require('karma'),
   webpack = require('webpack'),
@@ -33,7 +30,7 @@ gulp.task('build', 'Build for release', function (done) {
     'compile:ts',
     'min',
     'generatecustomdts',
-    'header',
+    'prepend',
     done
   );
 });
@@ -46,16 +43,6 @@ gulp.task('test', 'Run all tests', function (done) {
     'test:spec',
     done
   );
-});
-
-gulp.task('ghpages', 'Deploy documentation to gh-pages', ['nojekyll'], function () {
-  return gulp.src(['./docs/**/*'], {
-    dot: true
-  })
-    .pipe(ghPages({
-      force: true,
-      message: 'Update ' + moment().format('LLL')
-    }));
 });
 
 gulp.task('nojekyll', 'Add .nojekyll file to docs directory', function (done) {
@@ -78,9 +65,9 @@ gulp.task('compile:ts', 'Compile source files', function () {
     .pipe(gulp.dest('./dist'));
 });
 
-gulp.task('header', 'Add header to distributed files', function () {
+gulp.task('prepend', 'Add header to distributed files', function () {
   return gulp.src(['./dist/*.d.ts'])
-    .pipe(header(gulpBanner))
+    .pipe(prepend(gulpBanner))
     .pipe(gulp.dest('./dist'));
 });
 
@@ -115,7 +102,7 @@ gulp.task('compile:spec', 'Compile typescript for tests', function () {
     .pipe(gulp.dest('./tmp'));
 });
 
-gulp.task('generatecustomdts', 'Generate dts with no exports', function (done) {
+gulp.task('generatecustomdts', 'Generate dts with no exports', function () {
   return gulp.src(['./dist/*.d.ts'])
     .pipe(replace(/export\s/g, ''))
     .pipe(rename(function (path) {
