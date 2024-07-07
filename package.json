@@ -69,7 +69,8 @@
   },
   "overrides": {
     "glob-parent": "^6.0.2",
-    "micromatch": "^4.0.5"
+    "micromatch": "^4.0.5",
+    "braces": "^3.0.3"
   },
   "publishConfig": {
     "tag": "beta"
