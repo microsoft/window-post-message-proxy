@@ -1,0 +1,8 @@
+#############################################################
+# This is an Ownership Enforcer owners.txt file.
+# You can add comments using ; or # as prefix.
+# Only one alias per line is accepted.
+# Information on Ownership Enforcer can be found at https://aka.ms/ownershipenforcer
+#############################################################
+
+corembed

@@ -6,9 +6,7 @@
   },
   "exclude": [
     "node_modules",
-    "typings/index.d.ts",
     "dist",
-    "test",
     "tmp"
   ]
 }
