@@ -1,14 +1,11 @@
 var gulp = require('gulp');
 var del = require('del'),
-  ghPages = require('gulp-gh-pages'),
-  header = require('gulp-header'),
+prepend = require('gulp-prepend'),
   help = require('gulp-help-four'),
   fs = require('fs'),
-  moment = require('moment'),
   rename = require('gulp-rename'),
   replace = require('gulp-replace'),
-  tslint = require('gulp-tslint'),
-  typedoc = require("gulp-typedoc"),
+  eslint = require('gulp-eslint'),
   uglify = require('gulp-uglify'),
   karma = require('karma'),
   webpack = require('webpack'),
@@ -16,7 +13,8 @@ var del = require('del'),
   webpackConfig = require('./webpack.config'),
   webpackTestConfig = require('./webpack.test.config'),
   runSequence = require('gulp4-run-sequence'),
-  argv = require('yargs').argv
+  argv = require('yargs').argv,
+  saveLicense = require('uglify-save-license')
   ;
 
 help(gulp, undefined);
@@ -27,52 +25,24 @@ var gulpBanner = "/*! " + webpackBanner + " */\n";
 
 gulp.task('build', 'Build for release', function (done) {
   return runSequence(
-    'tslint:build',
+    'lint:ts',
     'clean:dist',
     'compile:ts',
     'min',
     'generatecustomdts',
-    'header',
+    'prepend',
     done
   );
 });
 
 gulp.task('test', 'Run all tests', function (done) {
   return runSequence(
-    'tslint:test',
+    'lint:ts',
     'clean:tmp',
     'compile:spec',
     'test:spec',
     done
   );
-});
-
-gulp.task('ghpages', 'Deploy documentation to gh-pages', ['nojekyll'], function () {
-  return gulp.src(['./docs/**/*'], {
-    dot: true
-  })
-    .pipe(ghPages({
-      force: true,
-      message: 'Update ' + moment().format('LLL')
-    }));
-});
-
-gulp.task("docs", 'Compile documentation from src code', function () {
-  return gulp
-    .src(["typings/globals/es6-promise/index.d.ts", "src/**/*.ts"])
-    .pipe(typedoc({
-      mode: 'modules',
-      includeDeclarations: true,
-
-      // Output options (see typedoc docs) 
-      out: "./docs",
-      json: "./docs/json/" + package.name + ".json",
-
-      // TypeDoc options (see typedoc docs) 
-      ignoreCompilerErrors: true,
-      version: true
-    }))
-    ;
 });
 
 gulp.task('nojekyll', 'Add .nojekyll file to docs directory', function (done) {
@@ -90,21 +60,23 @@ gulp.task('compile:ts', 'Compile source files', function () {
     new webpack.BannerPlugin(webpackBanner)
   ];
 
-  return gulp.src(['typings/**/*.d.ts', './src/**/*.ts'])
+  return gulp.src(['./src/**/*.ts'])
     .pipe(webpackStream(webpackConfig))
     .pipe(gulp.dest('./dist'));
 });
 
-gulp.task('header', 'Add header to distributed files', function () {
+gulp.task('prepend', 'Add header to distributed files', function () {
   return gulp.src(['./dist/*.d.ts'])
-    .pipe(header(gulpBanner))
+    .pipe(prepend(gulpBanner))
     .pipe(gulp.dest('./dist'));
 });
 
 gulp.task('min', 'Minify build files', function () {
   return gulp.src(['./dist/*.js'])
     .pipe(uglify({
-      preserveComments: 'license'
+      output: {
+          comments: saveLicense
+      }
     }))
     .pipe(rename({
       suffix: '.min'
@@ -130,7 +102,7 @@ gulp.task('compile:spec', 'Compile typescript for tests', function () {
     .pipe(gulp.dest('./tmp'));
 });
 
-gulp.task('generatecustomdts', 'Generate dts with no exports', function (done) {
+gulp.task('generatecustomdts', 'Generate dts with no exports', function () {
   return gulp.src(['./dist/*.d.ts'])
     .pipe(replace(/export\s/g, ''))
     .pipe(rename(function (path) {
@@ -140,25 +112,19 @@ gulp.task('generatecustomdts', 'Generate dts with no exports', function (done) {
 });
 
 gulp.task('test:spec', 'Runs spec tests', function (done) {
-  new karma.Server.start({
+  new karma.Server({
     configFile: __dirname + '/karma.conf.js',
     singleRun: argv.watch ? false : true,
     captureTimeout: argv.timeout || 20000
-  }, done);
+  }, function () {
+    done();
+  }).start();
 });
 
-gulp.task('tslint:build', 'Run TSLint on src', function () {
-  return gulp.src(["src/**/*.ts"])
-    .pipe(tslint({
+gulp.task('lint:ts', 'Lints all TypeScript', function () {
+  return gulp.src(['./src/**/*.ts', './test/**/*.ts'])
+    .pipe(eslint({
       formatter: "verbose"
     }))
-    .pipe(tslint.report());
-});
-
-gulp.task('tslint:test', 'Run TSLint on src and tests', function () {
-  return gulp.src(["src/**/*.ts", "test/**/*.ts"])
-    .pipe(tslint({
-      formatter: "verbose"
-    }))
-    .pipe(tslint.report());
+    .pipe(eslint.format());
 });

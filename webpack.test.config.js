@@ -1,4 +1,7 @@
+const webpack = require('webpack'); // To access built-in plugins
+
 module.exports = {
+  mode: 'development',
   entry: './test/windowPostMessageProxy.spec.ts',
   output: {
     path: __dirname + "/tmp",
@@ -9,11 +12,15 @@ module.exports = {
     extensions: ['', '.webpack.js', '.web.js', '.ts', '.js']
   },
   module: {
-    loaders: [
-      { test: /\.ts$/, loader: 'ts-loader' }
+    rules: [
+      { test: /\.ts$/, use: 'ts-loader' }
     ]
   },
-  ts: {
-    configFileName: "webpack.test.tsconfig.json"
-  }
+  plugins: [
+    new webpack.LoaderOptionsPlugin({
+        ts: {
+            configFileName: "webpack.test.tsconfig.json"
+        }
+    })
+  ]
 }

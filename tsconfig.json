@@ -2,15 +2,14 @@
   "compilerOptions": {
     "target": "es5",
     "declaration": true,
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "sourceMap": true,
     "outDir": "dist"
   },
   "exclude": [
     "node_modules",
-    "typings/index.d.ts",
     "dist",
-    "test",
-    "tmp"
+    "tmp",
+    "test"
   ]
 }

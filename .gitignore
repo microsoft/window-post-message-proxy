@@ -7,3 +7,7 @@ tmp
 .publish
 npm-debug.log*
 package-lock.json
+.pipelines
+owners.txt
+.npmrc
+

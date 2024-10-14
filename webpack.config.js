@@ -1,6 +1,7 @@
 var package = require('./package.json');
 
 module.exports = {
+  mode: 'production',
   entry: {
     'windowPostMessageProxy': './src/windowPostMessageProxy.ts'
   },
@@ -15,8 +16,8 @@ module.exports = {
     extensions: ['', '.webpack.js', '.web.js', '.ts', '.js']
   },
   module: {
-    loaders: [
-      { test: /\.ts$/, loader: 'ts-loader' }
+    rules: [
+      { test: /\.ts$/, use: 'ts-loader' }
     ]
   }
 }
